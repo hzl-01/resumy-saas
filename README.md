@@ -54,6 +54,7 @@ Use custom typography:
 
 ```bash
 bun run index.ts generate pdf ... \
+  --theme-color "#0f766e" \
   --font-family '"IBM Plex Sans", "Segoe UI", sans-serif' \
   --heading-font-family '"Newsreader", serif'
 ```
@@ -92,6 +93,7 @@ Zero-based indices are used to attach bullets and tech stacks to the matching en
 
 Typography can be controlled with:
 
+- `--theme-color` for the overall accent color
 - `--font-family` for the main body text stack
 - `--heading-font-family` for headings, section titles, and entry titles
 - `--font-face` to embed local `.ttf`, `.otf`, `.woff`, or `.woff2` files into the generated HTML/PDF

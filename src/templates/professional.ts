@@ -19,9 +19,9 @@ const PROFESSIONAL_CSS = `
     --text-soft: #3b475d;
     --muted: #617088;
     --accent: #0b5fff;
-    --section-title: #0f4bcc;
-    --chip-bg: #edf3ff;
-    --chip-text: #14357f;
+    --section-title: color-mix(in srgb, var(--accent) 82%, #0f172a);
+    --chip-bg: color-mix(in srgb, var(--accent) 10%, white);
+    --chip-text: color-mix(in srgb, var(--accent) 68%, #0f172a);
     font-family: var(--resume-body-font, "Avenir Next", "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif);
     padding: 24px;
   }
@@ -37,7 +37,7 @@ const PROFESSIONAL_CSS = `
     gap: 0.85rem;
     padding-bottom: 1.2rem;
     margin-bottom: 1.4rem;
-    border-bottom: 2px solid rgba(11, 95, 255, 0.12);
+    border-bottom: 2px solid color-mix(in srgb, var(--accent) 14%, white);
   }
 
   .theme-professional .resume-title {
@@ -83,10 +83,20 @@ const PROFESSIONAL_CSS = `
     display: grid;
     grid-template-columns: minmax(0, 1.4fr) minmax(220px, 0.95fr);
     gap: 1.5rem;
+    align-items: start;
   }
 
   .theme-professional .skills-and-education > * {
     min-width: 0;
+  }
+
+  .theme-professional .skills-section,
+  .theme-professional .education-section,
+  .theme-professional .custom-section,
+  .theme-professional .skill-group,
+  .theme-professional .chip-list {
+    break-inside: avoid;
+    page-break-inside: avoid;
   }
 
   @media (max-width: 860px) {
@@ -113,6 +123,14 @@ const PROFESSIONAL_CSS = `
     .professional-shell {
       padding: 0;
       box-shadow: none;
+    }
+
+    .theme-professional .skills-and-education {
+      display: block;
+    }
+
+    .theme-professional .skills-and-education > .resume-section + .resume-section {
+      margin-top: 1.5rem;
     }
   }
 `;
@@ -168,6 +186,10 @@ function renderTypographyCss(options?: ResumeTemplateRenderOptions): string {
 
   if (options?.headingFontFamily) {
     declarations.push(`--resume-heading-font: ${options.headingFontFamily};`);
+  }
+
+  if (options?.accentColor) {
+    declarations.push(`--accent: ${options.accentColor};`);
   }
 
   if (declarations.length === 0) {

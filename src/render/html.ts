@@ -292,6 +292,7 @@ export function renderSummarySection(summary?: string): string {
   return renderSection(
     "Summary",
     `<p class="entry-summary">${escapeHtml(summary)}</p>`,
+    "summary-section",
   );
 }
 
@@ -303,6 +304,7 @@ export function renderExperienceSection(items: ResumeExperience[]): string {
   return renderSection(
     "Experience",
     items.map(renderExperienceEntry).join(""),
+    "experience-section",
   );
 }
 
@@ -314,6 +316,7 @@ export function renderProjectsSection(items: ResumeProject[]): string {
   return renderSection(
     "Projects",
     items.map(renderProjectEntry).join(""),
+    "projects-section",
   );
 }
 
@@ -325,6 +328,7 @@ export function renderEducationSection(items: ResumeEducation[]): string {
   return renderSection(
     "Education",
     items.map(renderEducationEntry).join(""),
+    "education-section",
   );
 }
 
@@ -353,6 +357,7 @@ export function renderSkillsSection(items: ResumeSkillGroup[]): string {
           .join("")}
       </div>
     `,
+    "skills-section",
   );
 }
 

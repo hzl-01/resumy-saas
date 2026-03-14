@@ -19,6 +19,10 @@ export function registerGenerateCommand(cli: CAC): void {
     .option("--page-size <size>", "PDF page size: letter or a4.", {
       default: "letter",
     })
+    .option(
+      "--theme-color <value>",
+      "Accent color used for links, section headings, chips, and decorative borders.",
+    )
     .option("--font-family <value>", "Body font family or CSS font-family stack.")
     .option(
       "--heading-font-family <value>",
@@ -78,7 +82,7 @@ export function registerGenerateCommand(cli: CAC): void {
     )
     .example(
       (bin) =>
-        `${bin} generate pdf --name "Jordan Lee" --title "Product Engineer" --font-family '"IBM Plex Sans", "Segoe UI", sans-serif' --experience "role=Senior Product Engineer;company=Northstar Labs;start=2022;end=Present;location=Remote" --experience-bullet "0|Built a design system" --skill-group "Languages|TypeScript, JavaScript, SQL" --output ./dist/resume.pdf`,
+        `${bin} generate pdf --name "Jordan Lee" --title "Product Engineer" --theme-color "#0f766e" --font-family '"IBM Plex Sans", "Segoe UI", sans-serif' --experience "role=Senior Product Engineer;company=Northstar Labs;start=2022;end=Present;location=Remote" --experience-bullet "0|Built a design system" --skill-group "Languages|TypeScript, JavaScript, SQL" --output ./dist/resume.pdf`,
     )
     .action(async (format: string, options: GeneratePdfOptions) => {
       await handleGenerate(format, options);
@@ -111,6 +115,7 @@ export async function handleGenerate(
     fontFaceCss,
     bodyFontFamily: request.typography.bodyFontFamily,
     headingFontFamily: request.typography.headingFontFamily,
+    accentColor: request.theme.accentColor,
   });
 
   await renderPdf({

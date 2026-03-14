@@ -13,6 +13,7 @@ export interface GeneratePdfOptions {
   htmlOutput?: string;
   template?: string;
   pageSize?: string;
+  themeColor?: string;
   fontFamily?: string;
   headingFontFamily?: string;
   fontFace?: string | string[];
@@ -49,12 +50,17 @@ export interface ResumeTypographyOptions {
   fontFaces: ResumeFontFace[];
 }
 
+export interface ResumeThemeOptions {
+  accentColor?: string;
+}
+
 export interface PdfRenderRequest {
   document: ResumeDocument;
   htmlOutput?: string;
   output: string;
   pageSize: "letter" | "a4";
   templateId: string;
+  theme: ResumeThemeOptions;
   typography: ResumeTypographyOptions;
 }
 
@@ -72,6 +78,9 @@ export function buildPdfRenderRequest(
     output,
     pageSize,
     templateId,
+    theme: {
+      accentColor: normalizeCssValue(options.themeColor, "--theme-color"),
+    },
     typography: {
       bodyFontFamily: optionalString(options.fontFamily),
       headingFontFamily: optionalString(options.headingFontFamily),
@@ -467,4 +476,23 @@ function normalizePageSize(pageSize: string | undefined): "letter" | "a4" {
   throw new CliError(
     `Unsupported page size "${pageSize}". Use \`letter\` or \`a4\`.`,
   );
+}
+
+function normalizeCssValue(
+  value: string | undefined,
+  optionName: string,
+): string | undefined {
+  const trimmed = value?.trim();
+
+  if (!trimmed) {
+    return undefined;
+  }
+
+  if (/[;\n\r{}]/.test(trimmed)) {
+    throw new CliError(
+      `${optionName} contains unsupported characters. Pass a plain CSS color value such as \`#2563eb\` or \`rgb(37 99 235)\`.`,
+    );
+  }
+
+  return trimmed;
 }
