@@ -68,8 +68,8 @@ const CLASSIC_CSS = `
 
   .theme-classic .classic-body {
     display: grid;
-    grid-template-columns: 1fr 240px;
-    gap: 1.4rem;
+    grid-template-columns: 1fr 260px;
+    gap: 2rem;
     align-items: start;
   }
 
@@ -79,7 +79,7 @@ const CLASSIC_CSS = `
 
   .theme-classic .classic-sidebar {
     min-width: 0;
-    padding-left: 1.2rem;
+    padding-left: 1.4rem;
     border-left: 1px solid #ddd;
   }
 
@@ -167,6 +167,16 @@ const CLASSIC_CSS = `
     border-radius: 3px;
   }
 
+  .theme-classic .classic-sidebar .entry-header {
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .theme-classic .classic-sidebar .entry-meta {
+    text-align: left;
+    font-size: 0.82rem;
+  }
+
   .theme-classic .skills-section,
   .theme-classic .education-section,
   .theme-classic .custom-section,
@@ -211,7 +221,7 @@ const CLASSIC_CSS = `
 
     .theme-classic .classic-body {
       display: grid;
-      grid-template-columns: 1fr 220px;
+      grid-template-columns: 1fr 240px;
     }
   }
 `;
