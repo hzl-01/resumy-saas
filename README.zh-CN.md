@@ -1,26 +1,26 @@
 # resumy
 
-English README. For Chinese documentation, see [README.zh-CN.md](https://github.com/ahpxex/resume-cli/blob/main/README.zh-CN.md).
+中文版文档。英文主文档见 [README.md](./README.md)。
 
-`resumy` is a Bun-first CLI for generating polished resumes from structured flags and built-in templates. It is designed to stay scriptable, deterministic, and friendly to agents or power users who prefer explicit command input over interactive flows.
+`resumy` 是一个以 Bun 为优先运行时的 CLI，用来通过结构化命令参数和内置模板生成排版稳定的简历 PDF。它的定位是可脚本化、可重复、适合自动化流程和 agent 场景，而不是交互式向导。
 
-## Install
+## 安装
 
-Install `resumy` globally with Bun:
+使用 Bun 全局安装：
 
 ```bash
 bun add -g resumy
 ```
 
-## Quick Start
+## 快速开始
 
-List the built-in templates:
+查看内置模板：
 
 ```bash
 resumy templates
 ```
 
-Generate a PDF resume:
+生成 PDF 简历：
 
 ```bash
 resumy generate pdf \
@@ -49,31 +49,32 @@ resumy generate pdf \
   --output ./dist/resume.pdf
 ```
 
-Write the intermediate HTML too:
+如果你想同时保留中间产出的 HTML，方便调试模板：
 
 ```bash
 resumy generate pdf ... --html-output ./dist/resume.html
 ```
 
-## Commands
+## 命令
 
-- `resumy templates`: list built-in layouts
-- `resumy generate pdf`: generate a resume PDF from explicit flags
+- `resumy templates`：列出内置模板
+- `resumy generate pdf`：通过显式参数生成 PDF 简历
 
-## How PDF Export Works
+## PDF 是怎么生成的
 
-`resumy` renders your structured resume data into HTML first, then launches a headless browser through Playwright and asks the browser to print that HTML to PDF. This keeps template development simple while preserving browser-quality layout, fonts, colors, and print styling.
+`resumy` 会先把结构化简历数据渲染成 HTML，然后通过 Playwright 启动无头浏览器，再让浏览器把这份 HTML 直接打印成 PDF。这个方案的好处是模板开发更直接，而且能复用浏览器的排版能力，字体、颜色、间距和打印样式都会更稳定。
 
-## Playwright And Chromium
+## Playwright 和 Chromium 说明
 
-- `resumy` depends on the Playwright JavaScript package for browser automation.
-- The published `resumy` package itself does not bundle a Chromium binary inside the package tarball.
-- At runtime, `resumy` first tries Playwright's Chromium. If that is unavailable, it falls back to a locally installed Google Chrome.
-- If neither browser is available, install Chromium with `bunx playwright install chromium`.
+- `resumy` 依赖的是 Playwright 的 JavaScript 包。
+- 发布出去的 `resumy` 包本身不会把 Chromium 二进制直接打进包体里。
+- 运行时会先尝试使用 Playwright 的 Chromium。
+- 如果 Playwright 的 Chromium 不可用，会回退到本机已有的 Google Chrome。
+- 如果两者都不可用，可以执行 `bunx playwright install chromium` 安装 Chromium。
 
-## Input Model
+## 输入模型
 
-The CLI is intentionally explicit. Repeated entries are passed with repeated flags:
+CLI 故意保持显式。重复条目通过重复参数传入：
 
 - `--experience "role=...;company=...;start=...;end=...;location=...;summary=..."`
 - `--experience-bullet "0|Built something"`
@@ -86,17 +87,17 @@ The CLI is intentionally explicit. Repeated entries are passed with repeated fla
 - `--skill-group "Languages|TypeScript, JavaScript, SQL"`
 - `--extra "Certifications|AWS Certified Cloud Practitioner"`
 
-Zero-based indices are used to attach bullets and technology stacks to the matching entries.
+这些附加项通过从 `0` 开始的索引挂到对应条目上。
 
-## Typography Options
+## 字体与排版
 
-- `--density`: `standard` or `compact`
-- `--theme-color`: accent color for links, headings, and visual details
-- `--font-family`: body font stack
-- `--heading-font-family`: heading font stack
-- `--font-face`: embed local `.ttf`, `.otf`, `.woff`, or `.woff2` files
+- `--density`：`standard` 或 `compact`
+- `--theme-color`：控制链接、标题和视觉强调色
+- `--font-family`：正文字体栈
+- `--heading-font-family`：标题字体栈
+- `--font-face`：嵌入本地 `.ttf`、`.otf`、`.woff`、`.woff2` 字体文件
 
-## Development
+## 开发
 
 ```bash
 bun install

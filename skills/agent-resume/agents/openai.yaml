@@ -1,0 +1,4 @@
+interface:
+  display_name: "Agent Resume"
+  short_description: "Tailor resume content and render PDFs with resumy"
+  default_prompt: "Use $agent-resume to collect background details, tailor resume copy to a target JD, and render a PDF with resumy."

@@ -20,7 +20,8 @@
   "type": "module",
   "files": [
     "dist/npm",
-    "README.md"
+    "README.md",
+    "README.zh-CN.md"
   ],
   "bin": {
     "resumy": "dist/npm/index.js"
