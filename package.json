@@ -1,6 +1,21 @@
 {
   "name": "resumy",
   "version": "0.1.0",
+  "description": "Bun-first CLI for generating polished resume PDFs from structured flags and built-in templates.",
+  "license": "MCP",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ahpxex/resume-cli.git"
+  },
+  "keywords": [
+    "resume",
+    "cv",
+    "cli",
+    "pdf",
+    "bun",
+    "typescript",
+    "template"
+  ],
   "main": "./dist/npm/index.js",
   "type": "module",
   "files": [

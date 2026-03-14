@@ -26,9 +26,7 @@ export function parseResumeJson(input: string): ResumeDocument {
   try {
     parsed = JSON.parse(input);
   } catch {
-    throw new ResumeValidationError([
-      "Input is not valid JSON. Run `resumy init` to generate a starter file.",
-    ]);
+    throw new ResumeValidationError(["Input is not valid JSON."]);
   }
 
   return normalizeResumeDocument(parsed);

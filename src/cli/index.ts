@@ -1,9 +1,10 @@
 import { cac } from "cac";
+import packageJson from "../../package.json" with { type: "json" };
 import { formatCliError } from "./errors.ts";
 import { registerGenerateCommand } from "./commands/generate.ts";
 import { registerTemplatesCommand } from "./commands/templates.ts";
 
-const CLI_VERSION = "0.1.0";
+const CLI_VERSION = packageJson.version;
 
 export async function runCli(argv: string[]): Promise<void> {
   const cli = createCli();

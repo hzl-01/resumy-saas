@@ -1,25 +1,30 @@
 # resumy
 
-`resumy` is a Bun-based CLI for generating resumes from agent-friendly command arguments with a print-first PDF output pipeline.
+`resumy` is a Bun-first CLI for generating polished resumes from structured flags and built-in templates. It is designed to stay scriptable, deterministic, and friendly to agents or power users who prefer explicit command input over interactive flows.
 
-## Install
+## English
+
+### Install
+
+Install `resumy` globally with Bun:
 
 ```bash
-bun install
+bun add -g resumy
 ```
 
-## Run
+### Quick Start
 
-List the built-in layouts:
+List the built-in templates:
 
 ```bash
-bun run index.ts templates
+resumy templates
 ```
 
-Generate a PDF resume directly from command arguments:
+Generate a PDF resume:
 
 ```bash
-bun run index.ts generate pdf \
+resumy generate pdf \
+  --theme professional \
   --name "Jordan Lee" \
   --title "Product Engineer" \
   --email "jordan@example.com" \
@@ -44,26 +49,26 @@ bun run index.ts generate pdf \
   --output ./dist/resume.pdf
 ```
 
-Also write the intermediate HTML for debugging:
+Write the intermediate HTML too:
 
 ```bash
-bun run index.ts generate pdf ... --html-output ./dist/resume.html
+resumy generate pdf ... --html-output ./dist/resume.html
 ```
 
 Use custom typography:
 
 ```bash
-bun run index.ts generate pdf ... \
+resumy generate pdf ... \
   --density compact \
   --theme-color "#0f766e" \
   --font-family '"IBM Plex Sans", "Segoe UI", sans-serif' \
   --heading-font-family '"Newsreader", serif'
 ```
 
-Embed local font files so the HTML and PDF are self-contained:
+Embed local font files so the HTML and PDF stay self-contained:
 
 ```bash
-bun run index.ts generate pdf ... \
+resumy generate pdf ... \
   --font-face "family=IBM Plex Sans;path=/absolute/path/IBMPlexSans-Regular.ttf;weight=400" \
   --font-face "family=IBM Plex Sans;path=/absolute/path/IBMPlexSans-SemiBold.ttf;weight=600" \
   --font-face "family=Newsreader;path=/absolute/path/Newsreader-Bold.ttf;weight=700" \
@@ -71,38 +76,80 @@ bun run index.ts generate pdf ... \
   --heading-font-family '"Newsreader", serif'
 ```
 
-## Commands
+### Commands
 
-- `generate pdf`: Generate a PDF resume from explicit command flags
-- `templates`: List built-in layouts
+- `resumy templates`: list built-in layouts
+- `resumy generate pdf`: generate a resume PDF from explicit flags
 
-## Input Style
+### Input Model
 
-This CLI is designed for agents, so verbose commands are acceptable. Repeated section data is passed with repeated flags:
+The CLI is intentionally explicit. Repeated entries are passed with repeated flags:
 
 - `--experience "role=...;company=...;start=...;end=...;location=...;summary=..."`
 - `--experience-bullet "0|Built something"`
 - `--experience-tech "0|TypeScript, React, Bun"`
 - `--project "name=...;role=...;url=...;summary=..."`
 - `--project-bullet "0|Shipped something"`
+- `--project-tech "0|TypeScript, Bun, HTML, CSS"`
 - `--education "institution=...;degree=...;start=...;end=...;location=..."`
 - `--education-highlight "0|Focused on ..."`
 - `--skill-group "Languages|TypeScript, JavaScript, SQL"`
 - `--extra "Certifications|AWS Certified Cloud Practitioner"`
 
-Zero-based indices are used to attach bullets and tech stacks to the matching entry.
+Zero-based indices are used to attach bullets and technology stacks to the matching entries.
 
-Typography can be controlled with:
+### Typography Options
 
-- `--density` for `standard` or `compact` layout spacing
-- `--theme-color` for the overall accent color
-- `--font-family` for the main body text stack
-- `--heading-font-family` for headings, section titles, and entry titles
-- `--font-face` to embed local `.ttf`, `.otf`, `.woff`, or `.woff2` files into the generated HTML/PDF
+- `--density`: `standard` or `compact`
+- `--theme-color`: accent color for links, headings, and visual details
+- `--font-family`: body font stack
+- `--heading-font-family`: heading font stack
+- `--font-face`: embed local `.ttf`, `.otf`, `.woff`, or `.woff2` files
 
-## Development
+### PDF Export Note
+
+PDF export relies on Playwright. If Chromium is not available locally, install it with:
 
 ```bash
+bunx playwright install chromium
+```
+
+### Development
+
+```bash
+bun install
 bun run check
 bun test
+bun run build
+```
+
+## 中文
+
+### 安装
+
+使用 Bun 全局安装：
+
+```bash
+bun add -g resumy
+```
+
+### 快速使用
+
+- `resumy templates`：查看内置模板
+- `resumy generate pdf ...`：通过显式参数生成 PDF 简历
+
+### 特点
+
+- 内置多套模板，统一使用同一份结构化输入
+- 命令行参数显式、可脚本化，适合 agent 和自动化流程
+- 支持输出 PDF，也可以同时保留调试用 HTML
+- 支持嵌入本地字体文件，方便生成自包含文档
+
+### 开发
+
+```bash
+bun install
+bun run check
+bun test
+bun run build
 ```
