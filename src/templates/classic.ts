@@ -68,25 +68,19 @@ const CLASSIC_CSS = `
 
   .theme-classic .classic-body {
     display: grid;
-    grid-template-columns: 1fr 0 260px;
-    gap: 0;
+    grid-template-columns: 1fr 280px;
+    column-gap: 2.4rem;
     align-items: start;
   }
 
   .theme-classic .classic-main {
     min-width: 0;
-    padding-right: 1.4rem;
-  }
-
-  .theme-classic .classic-divider {
-    width: 1px;
-    background: #ddd;
-    align-self: stretch;
   }
 
   .theme-classic .classic-sidebar {
     min-width: 0;
-    padding-left: 1.4rem;
+    border-left: 1px solid #ddd;
+    padding-left: 1.2rem;
   }
 
   .theme-classic .section-title {
@@ -205,16 +199,9 @@ const CLASSIC_CSS = `
       grid-template-columns: 1fr;
     }
 
-    .theme-classic .classic-main {
-      padding-right: 0;
-    }
-
-    .theme-classic .classic-divider {
-      display: none;
-    }
-
     .theme-classic .classic-sidebar {
       padding-left: 0;
+      border-left: none;
       padding-top: 0.8rem;
       border-top: 1px solid #ddd;
     }
@@ -233,7 +220,7 @@ const CLASSIC_CSS = `
 
     .theme-classic .classic-body {
       display: grid;
-      grid-template-columns: 1fr 0 240px;
+      grid-template-columns: 1fr 260px;
     }
   }
 `;
@@ -282,7 +269,7 @@ export const classicTemplate: ResumeTemplate = {
             <div class="classic-main">
               ${mainSections}
             </div>
-            ${sidebarSections ? `<div class="classic-divider"></div><aside class="classic-sidebar">${sidebarSections}</aside>` : ""}
+            ${sidebarSections ? `<aside class="classic-sidebar">${sidebarSections}</aside>` : ""}
           </div>
         </main>
       `,
