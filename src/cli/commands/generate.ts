@@ -6,7 +6,9 @@ import {
 import { CliError } from "../errors.ts";
 import { renderPdf } from "../../output/pdf.ts";
 import { buildEmbeddedFontCss } from "../../render/fonts.ts";
+import { renderThemeCss } from "../../render/theme-css.ts";
 import { getTemplate } from "../../templates/index.ts";
+import { getTheme } from "../../themes/index.ts";
 
 export function registerGenerateCommand(cli: CAC): void {
   cli
@@ -25,8 +27,13 @@ export function registerGenerateCommand(cli: CAC): void {
       { default: "standard" },
     )
     .option(
+      "--theme <name>",
+      "Color theme to apply. Built-in themes: default, minimal, warm, dark.",
+      { default: "default" },
+    )
+    .option(
       "--theme-color <value>",
-      "Accent color used for links, section headings, chips, and decorative borders.",
+      "Accent color override applied on top of the selected theme.",
     )
     .option("--font-family <value>", "Body font family or CSS font-family stack.")
     .option(
@@ -123,13 +130,22 @@ export async function handleGenerate(
     );
   }
 
+  const theme = getTheme(request.theme.themeId);
+
+  if (!theme) {
+    throw new CliError(
+      `Unknown theme "${request.theme.themeId}". Built-in themes: default, minimal, warm, dark.`,
+    );
+  }
+
   const fontFaceCss = await buildEmbeddedFontCss(request.typography.fontFaces);
+  const themeCss = renderThemeCss(theme, "theme-professional", request.theme.accentColor);
   const renderedHtml = template.render(request.document, {
     density: request.density,
     fontFaceCss,
+    themeCss,
     bodyFontFamily: request.typography.bodyFontFamily,
     headingFontFamily: request.typography.headingFontFamily,
-    accentColor: request.theme.accentColor,
     sectionOrder: request.sectionOrder,
   });
 

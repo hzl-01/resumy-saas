@@ -42,6 +42,7 @@ export interface GeneratePdfOptions {
   skillGroup?: string | string[];
   extra?: string | string[];
   sectionOrder?: string;
+  theme?: string;
 }
 
 export interface ResumeFontFace {
@@ -58,6 +59,7 @@ export interface ResumeTypographyOptions {
 }
 
 export interface ResumeThemeOptions {
+  themeId: string;
   accentColor?: string;
 }
 
@@ -94,6 +96,7 @@ export function buildPdfRenderRequest(
     templateId,
     sectionOrder,
     theme: {
+      themeId: options.theme ?? "default",
       accentColor: normalizeCssValue(options.themeColor, "--theme-color"),
     },
     typography: {
