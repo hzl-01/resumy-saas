@@ -32,6 +32,11 @@ const BASE_CSS = `
     text-decoration: none;
   }
 
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
   a:hover {
     text-decoration: underline;
   }
@@ -91,6 +96,11 @@ const BASE_CSS = `
     margin-top: 1.15rem;
   }
 
+  .entry {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+
   .entry-header {
     display: flex;
     justify-content: space-between;
@@ -123,6 +133,12 @@ const BASE_CSS = `
     margin: 0.65rem 0 0;
     color: var(--text-soft, #433d39);
     line-height: 1.6;
+  }
+
+  .entry-tech {
+    margin: 0.7rem 0 0;
+    font-size: 0.9rem;
+    color: var(--muted, #6b645d);
   }
 
   .entry-list {
@@ -360,6 +376,11 @@ function renderExperienceEntry(item: ResumeExperience): string {
         <p class="entry-meta">${escapeHtml(formatMeta(item.startDate, item.endDate, item.location))}</p>
       </div>
       ${item.summary ? `<p class="entry-summary">${escapeHtml(item.summary)}</p>` : ""}
+      ${
+        item.technologies.length > 0
+          ? `<p class="entry-tech"><strong>Stack:</strong> ${escapeHtml(item.technologies.join(", "))}</p>`
+          : ""
+      }
       ${renderList(item.highlights)}
     </article>
   `;
@@ -387,9 +408,7 @@ function renderProjectEntry(item: ResumeProject): string {
       ${item.summary ? `<p class="entry-summary">${escapeHtml(item.summary)}</p>` : ""}
       ${
         item.technologies.length > 0
-          ? `<div class="chip-list">${item.technologies
-              .map((technology) => `<span class="chip">${escapeHtml(technology)}</span>`)
-              .join("")}</div>`
+          ? `<p class="entry-tech"><strong>Stack:</strong> ${escapeHtml(item.technologies.join(", "))}</p>`
           : ""
       }
       ${renderList(item.highlights)}

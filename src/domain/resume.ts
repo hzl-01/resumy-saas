@@ -31,6 +31,7 @@ export interface ResumeExperience {
   location?: string;
   summary?: string;
   highlights: string[];
+  technologies: string[];
 }
 
 export interface ResumeProject {

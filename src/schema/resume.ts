@@ -141,6 +141,11 @@ function normalizeExperience(
     location: readOptionalString(experience, "location", path, issues),
     summary: readOptionalString(experience, "summary", path, issues),
     highlights: readStringArray(experience?.highlights, `${path}.highlights`, issues),
+    technologies: readStringArray(
+      experience?.technologies,
+      `${path}.technologies`,
+      issues,
+    ),
   };
 }
 

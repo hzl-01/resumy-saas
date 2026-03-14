@@ -31,11 +31,11 @@ describe("resume schema", () => {
 
   test("renders the built-in classic template", () => {
     const sample = createStarterResume();
-    const classicTemplate = getTemplate("classic");
-    const html = classicTemplate?.render(sample);
+    const professionalTemplate = getTemplate("professional");
+    const html = professionalTemplate?.render(sample);
 
     expect(html).toContain("Jordan Lee");
-    expect(html).toContain("theme-classic");
+    expect(html).toContain("theme-professional");
   });
 
   test("parses JSON text", () => {

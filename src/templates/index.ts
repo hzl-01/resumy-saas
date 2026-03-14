@@ -1,9 +1,7 @@
-import { classicTemplate } from "./classic.ts";
-import { compactTemplate } from "./compact.ts";
-import { modernTemplate } from "./modern.ts";
+import { professionalTemplate } from "./professional.ts";
 import type { ResumeTemplate } from "./template.ts";
 
-const templateRegistry = [classicTemplate, modernTemplate, compactTemplate] as const;
+const templateRegistry = [professionalTemplate] as const;
 
 export function listTemplates(): readonly ResumeTemplate[] {
   return templateRegistry;

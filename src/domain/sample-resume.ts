@@ -35,6 +35,7 @@ const sampleResume: ResumeDocument = {
         "Improved end-to-end onboarding completion by 18% through a guided setup flow and tighter validation states.",
         "Partnered with design and support to turn recurring customer pain points into a prioritized delivery roadmap.",
       ],
+      technologies: ["TypeScript", "React", "Bun", "Design systems"],
     },
     {
       company: "Beacon Commerce",
@@ -48,6 +49,7 @@ const sampleResume: ResumeDocument = {
         "Delivered a seller analytics dashboard that became one of the top-used product areas within the first quarter.",
         "Introduced shared CI tooling that cut average review-to-release time by 30%.",
       ],
+      technologies: ["TypeScript", "Node.js", "SQL"],
     },
   ],
   education: [

@@ -1,7 +1,6 @@
 import { cac } from "cac";
 import { formatCliError } from "./errors.ts";
 import { registerGenerateCommand } from "./commands/generate.ts";
-import { registerInitCommand } from "./commands/init.ts";
 import { registerTemplatesCommand } from "./commands/templates.ts";
 
 const CLI_VERSION = "0.1.0";
@@ -36,15 +35,13 @@ function createCli() {
     .usage("<command> [options]")
     .help()
     .version(CLI_VERSION)
-    .example("resume-cli init ./resume.json")
     .example("resume-cli templates")
     .example(
-      "resume-cli generate ./resume.json --template modern --output ./dist/resume.html",
+      'resume-cli generate pdf --name "Jordan Lee" --title "Product Engineer" --experience "role=Senior Product Engineer;company=Northstar Labs" --experience-bullet "0|Built a design system" --output ./dist/resume.pdf',
     );
 
   registerGenerateCommand(cli);
   registerTemplatesCommand(cli);
-  registerInitCommand(cli);
 
   return cli;
 }

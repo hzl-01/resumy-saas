@@ -14,7 +14,8 @@
     "test": "bun test"
   },
   "dependencies": {
-    "cac": "^7.0.0"
+    "cac": "^7.0.0",
+    "playwright": "^1.58.2"
   },
   "devDependencies": {
     "@types/bun": "latest",
