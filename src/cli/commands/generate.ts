@@ -30,6 +30,11 @@ export function registerGenerateCommand(cli: CAC): void {
       "--theme-color <value>",
       "Accent color used for links, section headings, chips, and decorative borders.",
     )
+    .option(
+      "--language <code>",
+      "Language for section headers (en, zh, ja, ko, es, fr, de). Content language is independent.",
+      { default: "en" },
+    )
     .option("--font-family <value>", "Body font family or CSS font-family stack.")
     .option(
       "--heading-font-family <value>",
@@ -132,6 +137,7 @@ export async function handleGenerate(
     bodyFontFamily: request.typography.bodyFontFamily,
     headingFontFamily: request.typography.headingFontFamily,
     accentColor: request.theme.accentColor,
+    language: request.language,
     sectionOrder: request.sectionOrder,
   });
 

@@ -9,6 +9,7 @@ import {
   renderSkillsSection,
   renderSummarySection,
 } from "../render/html.ts";
+import { getSectionLabels } from "../render/i18n.ts";
 import {
   DEFAULT_SECTION_ORDER,
   type ResumeSectionKey,
@@ -231,46 +232,60 @@ export const classicTemplate: ResumeTemplate = {
   description: "Two-column layout with sidebar, serif typography, and traditional styling.",
   render(resume: ResumeDocument, options?: ResumeTemplateRenderOptions): string {
     const order = options?.sectionOrder ?? DEFAULT_SECTION_ORDER;
-
-    const mainKeys = new Set<ResumeSectionKey>(["summary", "experience", "projects", "custom"]);
-    const sidebarKeys = new Set<ResumeSectionKey>(["skills", "education"]);
+    const labels = getSectionLabels(options?.language ?? "en");
 
     const sectionRenderers: Record<ResumeSectionKey, () => string> = {
-      summary: () => renderSummarySection(resume.basics.summary),
-      experience: () => renderExperienceSection(resume.experience),
-      projects: () => renderProjectsSection(resume.projects),
-      skills: () => renderSkillsSection(resume.skills),
-      education: () => renderEducationSection(resume.education),
+      summary: () => renderSummarySection(resume.basics.summary, labels.summary),
+      experience: () => renderExperienceSection(resume.experience, labels.experience),
+      projects: () => renderProjectsSection(resume.projects, labels.projects),
+      skills: () => renderSkillsSection(resume.skills, labels.skills),
+      education: () => renderEducationSection(resume.education, labels.education),
       custom: () => renderCustomSections(resume.customSections),
     };
 
-    const mainSections = order
-      .filter((key) => mainKeys.has(key))
-      .map((key) => sectionRenderers[key]())
-      .filter(Boolean)
-      .join("\n");
+    const hasCustomOrder = !!options?.sectionOrder;
+    let bodyHtml: string;
 
-    const sidebarSections = order
-      .filter((key) => sidebarKeys.has(key))
-      .map((key) => sectionRenderers[key]())
-      .filter(Boolean)
-      .join("\n");
+    if (hasCustomOrder) {
+      const allSections = order
+        .map((key) => sectionRenderers[key]())
+        .filter(Boolean)
+        .join("\n");
+      bodyHtml = allSections;
+    } else {
+      const mainKeys = new Set<ResumeSectionKey>(["summary", "experience", "projects", "custom"]);
+      const sidebarKeys = new Set<ResumeSectionKey>(["skills", "education"]);
+
+      const mainSections = order
+        .filter((key) => mainKeys.has(key))
+        .map((key) => sectionRenderers[key]())
+        .filter(Boolean)
+        .join("\n");
+
+      const sidebarSections = order
+        .filter((key) => sidebarKeys.has(key))
+        .map((key) => sectionRenderers[key]())
+        .filter(Boolean)
+        .join("\n");
+
+      bodyHtml = `
+        <div class="classic-body">
+          <div class="classic-main">${mainSections}</div>
+          ${sidebarSections ? `<aside class="classic-sidebar">${sidebarSections}</aside>` : ""}
+        </div>
+      `;
+    }
 
     return renderDocument({
       pageTitle: `${resume.basics.name} | Resume`,
       bodyClass: "theme-classic",
-      css: [options?.fontFaceCss ?? "", renderClassicTypographyCss(options), CLASSIC_CSS]
+      css: [options?.fontFaceCss ?? "", CLASSIC_CSS, renderClassicTypographyCss(options)]
         .filter(Boolean)
         .join("\n"),
       content: `
         <main class="page classic-shell">
           ${renderResumeHeader(resume)}
-          <div class="classic-body">
-            <div class="classic-main">
-              ${mainSections}
-            </div>
-            ${sidebarSections ? `<aside class="classic-sidebar">${sidebarSections}</aside>` : ""}
-          </div>
+          ${bodyHtml}
         </main>
       `,
     });

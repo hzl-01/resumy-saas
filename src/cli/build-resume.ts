@@ -43,6 +43,7 @@ export interface GeneratePdfOptions {
   extra?: string | string[];
   sectionOrder?: string;
   theme?: string;
+  language?: string;
 }
 
 export interface ResumeFontFace {
@@ -71,6 +72,7 @@ export interface PdfRenderRequest {
   density: ResumeDensity;
   pageSize: "letter" | "a4";
   templateId: string;
+  language: string;
   theme: ResumeThemeOptions;
   typography: ResumeTypographyOptions;
   sectionOrder: ResumeSectionKey[];
@@ -93,6 +95,7 @@ export function buildPdfRenderRequest(
     density,
     pageSize,
     templateId,
+    language: options.language ?? "en",
     sectionOrder,
     theme: {
       accentColor: normalizeCssValue(options.themeColor, "--theme-color"),

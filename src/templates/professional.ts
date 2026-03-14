@@ -9,6 +9,7 @@ import {
   renderSkillsSection,
   renderSummarySection,
 } from "../render/html.ts";
+import { getSectionLabels } from "../render/i18n.ts";
 import {
   DEFAULT_SECTION_ORDER,
   type ResumeSectionKey,
@@ -182,13 +183,14 @@ export const professionalTemplate: ResumeTemplate = {
   description: "A single-column, print-first resume layout optimized for PDF export.",
   render(resume: ResumeDocument, options?: ResumeTemplateRenderOptions): string {
     const order = options?.sectionOrder ?? DEFAULT_SECTION_ORDER;
+    const labels = getSectionLabels(options?.language ?? "en");
 
     const sectionRenderers: Record<ResumeSectionKey, () => string> = {
-      summary: () => renderSummarySection(resume.basics.summary),
-      experience: () => renderExperienceSection(resume.experience),
-      projects: () => renderProjectsSection(resume.projects),
-      skills: () => renderSkillsSection(resume.skills),
-      education: () => renderEducationSection(resume.education),
+      summary: () => renderSummarySection(resume.basics.summary, labels.summary),
+      experience: () => renderExperienceSection(resume.experience, labels.experience),
+      projects: () => renderProjectsSection(resume.projects, labels.projects),
+      skills: () => renderSkillsSection(resume.skills, labels.skills),
+      education: () => renderEducationSection(resume.education, labels.education),
       custom: () => renderCustomSections(resume.customSections),
     };
 
@@ -200,7 +202,7 @@ export const professionalTemplate: ResumeTemplate = {
     return renderDocument({
       pageTitle: `${resume.basics.name} | Resume`,
       bodyClass: "theme-professional",
-      css: [options?.fontFaceCss ?? "", renderTypographyCss(options), PROFESSIONAL_CSS]
+      css: [options?.fontFaceCss ?? "", PROFESSIONAL_CSS, renderTypographyCss(options)]
         .filter(Boolean)
         .join("\n"),
       content: `

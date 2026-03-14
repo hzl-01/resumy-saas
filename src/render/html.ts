@@ -284,61 +284,61 @@ export function renderResumeHeader(resume: ResumeDocument): string {
   `;
 }
 
-export function renderSummarySection(summary?: string): string {
+export function renderSummarySection(summary?: string, label = "Summary"): string {
   if (!summary) {
     return "";
   }
 
   return renderSection(
-    "Summary",
+    label,
     `<p class="entry-summary">${escapeHtml(summary)}</p>`,
     "summary-section",
   );
 }
 
-export function renderExperienceSection(items: ResumeExperience[]): string {
+export function renderExperienceSection(items: ResumeExperience[], label = "Experience"): string {
   if (items.length === 0) {
     return "";
   }
 
   return renderSection(
-    "Experience",
+    label,
     items.map(renderExperienceEntry).join(""),
     "experience-section",
   );
 }
 
-export function renderProjectsSection(items: ResumeProject[]): string {
+export function renderProjectsSection(items: ResumeProject[], label = "Projects"): string {
   if (items.length === 0) {
     return "";
   }
 
   return renderSection(
-    "Projects",
+    label,
     items.map(renderProjectEntry).join(""),
     "projects-section",
   );
 }
 
-export function renderEducationSection(items: ResumeEducation[]): string {
+export function renderEducationSection(items: ResumeEducation[], label = "Education"): string {
   if (items.length === 0) {
     return "";
   }
 
   return renderSection(
-    "Education",
+    label,
     items.map(renderEducationEntry).join(""),
     "education-section",
   );
 }
 
-export function renderSkillsSection(items: ResumeSkillGroup[]): string {
+export function renderSkillsSection(items: ResumeSkillGroup[], label = "Skills"): string {
   if (items.length === 0) {
     return "";
   }
 
   return renderSection(
-    "Skills",
+    label,
     `
       <div class="skill-stack">
         ${items
@@ -361,13 +361,13 @@ export function renderSkillsSection(items: ResumeSkillGroup[]): string {
   );
 }
 
-export function renderSkillsSectionPlain(items: ResumeSkillGroup[]): string {
+export function renderSkillsSectionPlain(items: ResumeSkillGroup[], label = "Skills"): string {
   if (items.length === 0) {
     return "";
   }
 
   return renderSection(
-    "Skills",
+    label,
     `
       <div class="skill-stack">
         ${items

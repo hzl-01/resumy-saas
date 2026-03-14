@@ -9,6 +9,7 @@ import {
   renderSkillsSectionPlain,
   renderSummarySection,
 } from "../render/html.ts";
+import { getSectionLabels } from "../render/i18n.ts";
 import {
   DEFAULT_SECTION_ORDER,
   type ResumeSectionKey,
@@ -172,13 +173,14 @@ export const minimalTemplate: ResumeTemplate = {
   description: "Ultra-clean layout with maximum whitespace and no decorative elements.",
   render(resume: ResumeDocument, options?: ResumeTemplateRenderOptions): string {
     const order = options?.sectionOrder ?? DEFAULT_SECTION_ORDER;
+    const labels = getSectionLabels(options?.language ?? "en");
 
     const sectionRenderers: Record<ResumeSectionKey, () => string> = {
-      summary: () => renderSummarySection(resume.basics.summary),
-      experience: () => renderExperienceSection(resume.experience),
-      projects: () => renderProjectsSection(resume.projects),
-      skills: () => renderSkillsSectionPlain(resume.skills),
-      education: () => renderEducationSection(resume.education),
+      summary: () => renderSummarySection(resume.basics.summary, labels.summary),
+      experience: () => renderExperienceSection(resume.experience, labels.experience),
+      projects: () => renderProjectsSection(resume.projects, labels.projects),
+      skills: () => renderSkillsSectionPlain(resume.skills, labels.skills),
+      education: () => renderEducationSection(resume.education, labels.education),
       custom: () => renderCustomSections(resume.customSections),
     };
 
@@ -190,7 +192,7 @@ export const minimalTemplate: ResumeTemplate = {
     return renderDocument({
       pageTitle: `${resume.basics.name} | Resume`,
       bodyClass: "theme-minimal",
-      css: [options?.fontFaceCss ?? "", renderMinimalTypographyCss(options), MINIMAL_CSS]
+      css: [options?.fontFaceCss ?? "", MINIMAL_CSS, renderMinimalTypographyCss(options)]
         .filter(Boolean)
         .join("\n"),
       content: `

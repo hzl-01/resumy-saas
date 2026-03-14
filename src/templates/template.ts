@@ -32,6 +32,7 @@ export interface ResumeTemplateRenderOptions {
   bodyFontFamily?: string;
   headingFontFamily?: string;
   accentColor?: string;
+  language?: string;
   sectionOrder?: ResumeSectionKey[];
 }
 
