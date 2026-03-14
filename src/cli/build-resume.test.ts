@@ -53,6 +53,7 @@ describe("buildResumeDocument", () => {
       title: "Product Engineer",
       summary: "Product-minded engineer.",
       skillGroup: ["Languages|TypeScript, JavaScript"],
+      density: "compact",
       themeColor: "#0f766e",
       fontFamily: '"IBM Plex Sans", sans-serif',
       headingFontFamily: '"Newsreader", serif',
@@ -63,6 +64,7 @@ describe("buildResumeDocument", () => {
     });
 
     expect(request.document.basics.name).toBe("Jordan Lee");
+    expect(request.density).toBe("compact");
     expect(request.theme.accentColor).toBe("#0f766e");
     expect(request.typography.bodyFontFamily).toBe('"IBM Plex Sans", sans-serif');
     expect(request.typography.headingFontFamily).toBe('"Newsreader", serif');

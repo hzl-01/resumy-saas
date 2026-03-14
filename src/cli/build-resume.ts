@@ -13,6 +13,7 @@ export interface GeneratePdfOptions {
   htmlOutput?: string;
   template?: string;
   pageSize?: string;
+  density?: string;
   themeColor?: string;
   fontFamily?: string;
   headingFontFamily?: string;
@@ -54,10 +55,13 @@ export interface ResumeThemeOptions {
   accentColor?: string;
 }
 
+export type ResumeDensity = "standard" | "compact";
+
 export interface PdfRenderRequest {
   document: ResumeDocument;
   htmlOutput?: string;
   output: string;
+  density: ResumeDensity;
   pageSize: "letter" | "a4";
   templateId: string;
   theme: ResumeThemeOptions;
@@ -69,6 +73,7 @@ export function buildPdfRenderRequest(
 ): PdfRenderRequest {
   const templateId = options.template ?? "professional";
   const pageSize = normalizePageSize(options.pageSize);
+  const density = normalizeDensity(options.density);
   const document = buildResumeDocument(options);
   const output = options.output ?? `resume.${templateId}.${pageSize}.pdf`;
 
@@ -76,6 +81,7 @@ export function buildPdfRenderRequest(
     document,
     htmlOutput: options.htmlOutput,
     output,
+    density,
     pageSize,
     templateId,
     theme: {
@@ -475,6 +481,18 @@ function normalizePageSize(pageSize: string | undefined): "letter" | "a4" {
 
   throw new CliError(
     `Unsupported page size "${pageSize}". Use \`letter\` or \`a4\`.`,
+  );
+}
+
+function normalizeDensity(density: string | undefined): ResumeDensity {
+  const normalized = density?.trim().toLowerCase() ?? "standard";
+
+  if (normalized === "standard" || normalized === "compact") {
+    return normalized;
+  }
+
+  throw new CliError(
+    `Unsupported density "${density}". Use \`standard\` or \`compact\`.`,
   );
 }
 

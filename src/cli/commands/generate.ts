@@ -20,6 +20,11 @@ export function registerGenerateCommand(cli: CAC): void {
       default: "letter",
     })
     .option(
+      "--density <value>",
+      "Layout density preset: standard or compact.",
+      { default: "standard" },
+    )
+    .option(
       "--theme-color <value>",
       "Accent color used for links, section headings, chips, and decorative borders.",
     )
@@ -84,6 +89,10 @@ export function registerGenerateCommand(cli: CAC): void {
       (bin) =>
         `${bin} generate pdf --name "Jordan Lee" --title "Product Engineer" --theme-color "#0f766e" --font-family '"IBM Plex Sans", "Segoe UI", sans-serif' --experience "role=Senior Product Engineer;company=Northstar Labs;start=2022;end=Present;location=Remote" --experience-bullet "0|Built a design system" --skill-group "Languages|TypeScript, JavaScript, SQL" --output ./dist/resume.pdf`,
     )
+    .example(
+      (bin) =>
+        `${bin} generate pdf --density compact --name "Jordan Lee" --title "Product Engineer" --experience "role=Senior Product Engineer;company=Northstar Labs" --experience-bullet "0|Built a design system" --skill-group "Languages|TypeScript, JavaScript, SQL" --output ./dist/resume-compact.pdf`,
+    )
     .action(async (format: string, options: GeneratePdfOptions) => {
       await handleGenerate(format, options);
     });
@@ -112,6 +121,7 @@ export async function handleGenerate(
 
   const fontFaceCss = await buildEmbeddedFontCss(request.typography.fontFaces);
   const renderedHtml = template.render(request.document, {
+    density: request.density,
     fontFaceCss,
     bodyFontFamily: request.typography.bodyFontFamily,
     headingFontFamily: request.typography.headingFontFamily,

@@ -42,10 +42,10 @@ export async function renderPdf(options: RenderPdfOptions): Promise<void> {
       format: pageSize === "a4" ? "A4" : "Letter",
       printBackground: true,
       margin: {
-        top: "0.55in",
-        right: "0.55in",
-        bottom: "0.55in",
-        left: "0.55in",
+        top: "0.5in",
+        right: "0.5in",
+        bottom: "0.5in",
+        left: "0.5in",
       },
     });
   } finally {
