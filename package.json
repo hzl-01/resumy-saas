@@ -1,17 +1,23 @@
 {
-  "name": "resume-cli",
+  "name": "resumy",
   "version": "0.1.0",
-  "module": "index.ts",
+  "main": "./dist/npm/index.js",
   "type": "module",
-  "private": true,
+  "files": [
+    "dist/npm",
+    "README.md"
+  ],
   "bin": {
-    "resume-cli": "./index.ts"
+    "resumy": "dist/npm/index.js"
   },
   "scripts": {
     "start": "bun run index.ts",
     "dev": "bun run --watch index.ts",
+    "build": "bun build ./index.ts --target=node --format=esm --packages=external --outfile ./dist/npm/index.js",
     "check": "tsc --noEmit",
-    "test": "bun test"
+    "test": "bun test",
+    "prepack": "bun run build",
+    "prepublishOnly": "bun run check && bun test"
   },
   "dependencies": {
     "cac": "^7.0.0",

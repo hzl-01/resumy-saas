@@ -1,9 +1,9 @@
 import { existsSync } from "node:fs";
-import { mkdir } from "node:fs/promises";
+import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 
 export async function readUtf8File(filePath: string): Promise<string> {
-  return Bun.file(filePath).text();
+  return readFile(filePath, "utf8");
 }
 
 export async function writeUtf8File(
@@ -12,7 +12,7 @@ export async function writeUtf8File(
 ): Promise<void> {
   const resolvedPath = resolve(filePath);
   await mkdir(dirname(resolvedPath), { recursive: true });
-  await Bun.write(resolvedPath, contents);
+  await writeFile(resolvedPath, contents, "utf8");
 }
 
 export function fileExists(filePath: string): boolean {

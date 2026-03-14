@@ -29,15 +29,15 @@ export async function runCli(argv: string[]): Promise<void> {
 }
 
 function createCli() {
-  const cli = cac("resume-cli");
+  const cli = cac("resumy");
 
   cli
     .usage("<command> [options]")
     .help()
     .version(CLI_VERSION)
-    .example("resume-cli templates")
+    .example("resumy templates")
     .example(
-      'resume-cli generate pdf --name "Jordan Lee" --title "Product Engineer" --experience "role=Senior Product Engineer;company=Northstar Labs" --experience-bullet "0|Built a design system" --output ./dist/resume.pdf',
+      'resumy generate pdf --name "Jordan Lee" --title "Product Engineer" --experience "role=Senior Product Engineer;company=Northstar Labs" --experience-bullet "0|Built a design system" --output ./dist/resume.pdf',
     );
 
   registerGenerateCommand(cli);

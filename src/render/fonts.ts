@@ -1,3 +1,4 @@
+import { readFile } from "node:fs/promises";
 import { resolve } from "node:path";
 import type { ResumeFontFace } from "../cli/build-resume.ts";
 import { CliError } from "../cli/errors.ts";
@@ -27,13 +28,20 @@ async function renderFontFace(fontFace: ResumeFontFace): Promise<string> {
     );
   }
 
-  const file = Bun.file(absolutePath);
+  let fileContents: Buffer;
+  try {
+    fileContents = await readFile(absolutePath);
+  } catch (error) {
+    const fsError = error as NodeJS.ErrnoException;
 
-  if (!(await file.exists())) {
-    throw new CliError(`Font file not found: ${absolutePath}`);
+    if (fsError.code === "ENOENT") {
+      throw new CliError(`Font file not found: ${absolutePath}`);
+    }
+
+    throw error;
   }
 
-  const base64 = Buffer.from(await file.arrayBuffer()).toString("base64");
+  const base64 = fileContents.toString("base64");
 
   return `
     @font-face {

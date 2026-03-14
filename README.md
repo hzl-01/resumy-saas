@@ -1,6 +1,6 @@
-# resume-cli
+# resumy
 
-`resume-cli` is a Bun-based CLI for generating resumes from agent-friendly command arguments with a print-first PDF output pipeline.
+`resumy` is a Bun-based CLI for generating resumes from agent-friendly command arguments with a print-first PDF output pipeline.
 
 ## Install
 

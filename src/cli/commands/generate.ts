@@ -117,7 +117,7 @@ export async function handleGenerate(
 
   if (normalizedFormat !== "pdf") {
     throw new CliError(
-      `Unsupported format "${format}". PDF is implemented first, so use \`resume-cli generate pdf ...\` for now.`,
+      `Unsupported format "${format}". PDF is implemented first, so use \`resumy generate pdf ...\` for now.`,
     );
   }
 
