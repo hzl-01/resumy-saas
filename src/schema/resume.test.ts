@@ -29,7 +29,7 @@ describe("resume schema", () => {
     );
   });
 
-  test("renders the built-in classic template", () => {
+  test("renders the built-in professional template", () => {
     const sample = createStarterResume();
     const professionalTemplate = getTemplate("professional");
     const html = professionalTemplate?.render(sample);

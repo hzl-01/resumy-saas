@@ -13,6 +13,9 @@ export interface GeneratePdfOptions {
   htmlOutput?: string;
   template?: string;
   pageSize?: string;
+  fontFamily?: string;
+  headingFontFamily?: string;
+  fontFace?: string | string[];
   name?: string;
   title?: string;
   email?: string;
@@ -33,12 +36,26 @@ export interface GeneratePdfOptions {
   extra?: string | string[];
 }
 
+export interface ResumeFontFace {
+  family: string;
+  path: string;
+  style: string;
+  weight: string;
+}
+
+export interface ResumeTypographyOptions {
+  bodyFontFamily?: string;
+  headingFontFamily?: string;
+  fontFaces: ResumeFontFace[];
+}
+
 export interface PdfRenderRequest {
   document: ResumeDocument;
   htmlOutput?: string;
   output: string;
   pageSize: "letter" | "a4";
   templateId: string;
+  typography: ResumeTypographyOptions;
 }
 
 export function buildPdfRenderRequest(
@@ -55,6 +72,11 @@ export function buildPdfRenderRequest(
     output,
     pageSize,
     templateId,
+    typography: {
+      bodyFontFamily: optionalString(options.fontFamily),
+      headingFontFamily: optionalString(options.headingFontFamily),
+      fontFaces: parseFontFaces(asArray(options.fontFace)),
+    },
   };
 }
 
@@ -239,6 +261,19 @@ function parseLink(entry: string, label: string) {
     label: name,
     url,
   };
+}
+
+function parseFontFaces(entries: string[]): ResumeFontFace[] {
+  return entries.map((entry, index) => {
+    const fields = parseKeyValueFields(entry, `--font-face[${index}]`);
+
+    return {
+      family: getRequiredField(fields, "family", `--font-face[${index}]`),
+      path: getRequiredField(fields, "path", `--font-face[${index}]`),
+      weight: getOptionalField(fields, "weight") ?? "400",
+      style: getOptionalField(fields, "style") ?? "normal",
+    };
+  });
 }
 
 function applyIndexedTextItems<T>(

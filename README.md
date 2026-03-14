@@ -50,6 +50,25 @@ Also write the intermediate HTML for debugging:
 bun run index.ts generate pdf ... --html-output ./dist/resume.html
 ```
 
+Use custom typography:
+
+```bash
+bun run index.ts generate pdf ... \
+  --font-family '"IBM Plex Sans", "Segoe UI", sans-serif' \
+  --heading-font-family '"Newsreader", serif'
+```
+
+Embed local font files so the HTML and PDF are self-contained:
+
+```bash
+bun run index.ts generate pdf ... \
+  --font-face "family=IBM Plex Sans;path=/absolute/path/IBMPlexSans-Regular.ttf;weight=400" \
+  --font-face "family=IBM Plex Sans;path=/absolute/path/IBMPlexSans-SemiBold.ttf;weight=600" \
+  --font-face "family=Newsreader;path=/absolute/path/Newsreader-Bold.ttf;weight=700" \
+  --font-family '"IBM Plex Sans", sans-serif' \
+  --heading-font-family '"Newsreader", serif'
+```
+
 ## Commands
 
 - `generate pdf`: Generate a PDF resume from explicit command flags
@@ -70,6 +89,12 @@ This CLI is designed for agents, so verbose commands are acceptable. Repeated se
 - `--extra "Certifications|AWS Certified Cloud Practitioner"`
 
 Zero-based indices are used to attach bullets and tech stacks to the matching entry.
+
+Typography can be controlled with:
+
+- `--font-family` for the main body text stack
+- `--heading-font-family` for headings, section titles, and entry titles
+- `--font-face` to embed local `.ttf`, `.otf`, `.woff`, or `.woff2` files into the generated HTML/PDF
 
 ## Development
 

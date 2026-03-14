@@ -5,6 +5,7 @@ import {
 } from "../build-resume.ts";
 import { CliError } from "../errors.ts";
 import { renderPdf } from "../../output/pdf.ts";
+import { buildEmbeddedFontCss } from "../../render/fonts.ts";
 import { getTemplate } from "../../templates/index.ts";
 
 export function registerGenerateCommand(cli: CAC): void {
@@ -18,6 +19,15 @@ export function registerGenerateCommand(cli: CAC): void {
     .option("--page-size <size>", "PDF page size: letter or a4.", {
       default: "letter",
     })
+    .option("--font-family <value>", "Body font family or CSS font-family stack.")
+    .option(
+      "--heading-font-family <value>",
+      "Heading font family or CSS font-family stack.",
+    )
+    .option(
+      "--font-face <spec>",
+      'Embedded local font face using semicolon-separated key=value fields. Required keys: family, path. Optional keys: weight, style. Repeatable.',
+    )
     .option("--name <value>", "Full name shown in the resume header.")
     .option("--title <value>", "Professional title shown below the name.")
     .option("--email <value>", "Email address.")
@@ -68,7 +78,7 @@ export function registerGenerateCommand(cli: CAC): void {
     )
     .example(
       (bin) =>
-        `${bin} generate pdf --name "Jordan Lee" --title "Product Engineer" --email "jordan@example.com" --summary "Product-minded engineer..." --experience "role=Senior Product Engineer;company=Northstar Labs;start=2022;end=Present;location=Remote" --experience-bullet "0|Built a design system" --skill-group "Languages|TypeScript, JavaScript, SQL" --output ./dist/resume.pdf`,
+        `${bin} generate pdf --name "Jordan Lee" --title "Product Engineer" --font-family '"IBM Plex Sans", "Segoe UI", sans-serif' --experience "role=Senior Product Engineer;company=Northstar Labs;start=2022;end=Present;location=Remote" --experience-bullet "0|Built a design system" --skill-group "Languages|TypeScript, JavaScript, SQL" --output ./dist/resume.pdf`,
     )
     .action(async (format: string, options: GeneratePdfOptions) => {
       await handleGenerate(format, options);
@@ -96,7 +106,12 @@ export async function handleGenerate(
     );
   }
 
-  const renderedHtml = template.render(request.document);
+  const fontFaceCss = await buildEmbeddedFontCss(request.typography.fontFaces);
+  const renderedHtml = template.render(request.document, {
+    fontFaceCss,
+    bodyFontFamily: request.typography.bodyFontFamily,
+    headingFontFamily: request.typography.headingFontFamily,
+  });
 
   await renderPdf({
     html: renderedHtml,
@@ -105,7 +120,7 @@ export async function handleGenerate(
     pageSize: request.pageSize,
   });
 
-  console.log(`Generated ${template.label} PDF at ${request.output}`);
+  console.log(`Generated ${template.label} at ${request.output}`);
   if (request.htmlOutput) {
     console.log(`Also wrote debug HTML to ${request.htmlOutput}`);
   }

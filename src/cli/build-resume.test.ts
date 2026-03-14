@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { buildResumeDocument } from "./build-resume.ts";
+import { buildPdfRenderRequest, buildResumeDocument } from "./build-resume.ts";
 
 describe("buildResumeDocument", () => {
   test("builds a resume from repeated CLI flags", () => {
@@ -45,5 +45,26 @@ describe("buildResumeDocument", () => {
     expect(document.projects[0]?.technologies).toContain("CSS");
     expect(document.skills[0]?.items).toContain("SQL");
     expect(document.customSections[0]?.title).toBe("Certifications");
+  });
+
+  test("captures typography options for custom fonts", () => {
+    const request = buildPdfRenderRequest({
+      name: "Jordan Lee",
+      title: "Product Engineer",
+      summary: "Product-minded engineer.",
+      skillGroup: ["Languages|TypeScript, JavaScript"],
+      fontFamily: '"IBM Plex Sans", sans-serif',
+      headingFontFamily: '"Newsreader", serif',
+      fontFace: [
+        "family=IBM Plex Sans;path=/tmp/ibm-plex-sans-regular.ttf;weight=400",
+        "family=Newsreader;path=/tmp/newsreader-bold.ttf;weight=700",
+      ],
+    });
+
+    expect(request.document.basics.name).toBe("Jordan Lee");
+    expect(request.typography.bodyFontFamily).toBe('"IBM Plex Sans", sans-serif');
+    expect(request.typography.headingFontFamily).toBe('"Newsreader", serif');
+    expect(request.typography.fontFaces).toHaveLength(2);
+    expect(request.typography.fontFaces[0]?.family).toBe("IBM Plex Sans");
   });
 });

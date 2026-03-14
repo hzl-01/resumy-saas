@@ -9,7 +9,7 @@ import {
   renderSkillsSection,
   renderSummarySection,
 } from "../render/html.ts";
-import type { ResumeTemplate } from "./template.ts";
+import type { ResumeTemplate, ResumeTemplateRenderOptions } from "./template.ts";
 
 const PROFESSIONAL_CSS = `
   body.theme-professional {
@@ -22,8 +22,7 @@ const PROFESSIONAL_CSS = `
     --section-title: #0f4bcc;
     --chip-bg: #edf3ff;
     --chip-text: #14357f;
-    font-family:
-      "Avenir Next", "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+    font-family: var(--resume-body-font, "Avenir Next", "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif);
     padding: 24px;
   }
 
@@ -48,11 +47,13 @@ const PROFESSIONAL_CSS = `
   }
 
   .theme-professional .resume-name {
+    font-family: var(--resume-heading-font, var(--resume-body-font, "Avenir Next", "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif));
     font-size: clamp(2.1rem, 4vw, 3.05rem);
     font-weight: 800;
   }
 
   .theme-professional .section-title {
+    font-family: var(--resume-heading-font, var(--resume-body-font, "Avenir Next", "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif));
     margin-bottom: 0.72rem;
   }
 
@@ -69,6 +70,7 @@ const PROFESSIONAL_CSS = `
   }
 
   .theme-professional .entry-title {
+    font-family: var(--resume-heading-font, var(--resume-body-font, "Avenir Next", "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif));
     font-size: 1.01rem;
     font-weight: 700;
   }
@@ -119,7 +121,7 @@ export const professionalTemplate: ResumeTemplate = {
   id: "professional",
   label: "Professional PDF",
   description: "A single-column, print-first resume layout optimized for PDF export.",
-  render(resume: ResumeDocument): string {
+  render(resume: ResumeDocument, options?: ResumeTemplateRenderOptions): string {
     const primarySections = [
       renderSummarySection(resume.basics.summary),
       renderExperienceSection(resume.experience),
@@ -139,7 +141,9 @@ export const professionalTemplate: ResumeTemplate = {
     return renderDocument({
       pageTitle: `${resume.basics.name} | Resume`,
       bodyClass: "theme-professional",
-      css: PROFESSIONAL_CSS,
+      css: [options?.fontFaceCss ?? "", renderTypographyCss(options), PROFESSIONAL_CSS]
+        .filter(Boolean)
+        .join("\n"),
       content: `
         <main class="page professional-shell">
           ${renderResumeHeader(resume)}
@@ -154,3 +158,25 @@ export const professionalTemplate: ResumeTemplate = {
     });
   },
 };
+
+function renderTypographyCss(options?: ResumeTemplateRenderOptions): string {
+  const declarations: string[] = [];
+
+  if (options?.bodyFontFamily) {
+    declarations.push(`--resume-body-font: ${options.bodyFontFamily};`);
+  }
+
+  if (options?.headingFontFamily) {
+    declarations.push(`--resume-heading-font: ${options.headingFontFamily};`);
+  }
+
+  if (declarations.length === 0) {
+    return "";
+  }
+
+  return `
+    body.theme-professional {
+      ${declarations.join("\n")}
+    }
+  `;
+}
