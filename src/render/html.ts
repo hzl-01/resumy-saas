@@ -104,7 +104,7 @@ const BASE_CSS = `
   .entry-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: baseline;
     gap: 1rem;
   }
 
@@ -190,7 +190,7 @@ const BASE_CSS = `
     gap: 2rem;
   }
 
-  @media (max-width: 720px) {
+  @media (max-width: 480px) {
     .entry-header {
       flex-direction: column;
     }

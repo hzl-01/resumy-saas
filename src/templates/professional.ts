@@ -24,8 +24,8 @@ const PROFESSIONAL_CSS = `
     --chip-text: color-mix(in srgb, var(--accent) 68%, #0f172a);
     --page-padding: 0.88in 0.74in 0.72in;
     --header-gap: 0.62rem;
-    --header-padding-bottom: 0.9rem;
-    --header-margin-bottom: 0.98rem;
+    --header-padding-bottom: 0.68rem;
+    --header-margin-bottom: 0.78rem;
     --title-size: 0.96rem;
     --name-size: clamp(1.95rem, 3.4vw, 2.7rem);
     --section-title-gap: 0.5rem;
@@ -255,8 +255,8 @@ function renderTypographyCss(options?: ResumeTemplateRenderOptions): string {
 
   if (options?.density === "compact") {
     declarations.push("--header-gap: 0.5rem;");
-    declarations.push("--header-padding-bottom: 0.74rem;");
-    declarations.push("--header-margin-bottom: 0.72rem;");
+    declarations.push("--header-padding-bottom: 0.52rem;");
+    declarations.push("--header-margin-bottom: 0.58rem;");
     declarations.push("--section-title-gap: 0.32rem;");
     declarations.push("--section-spacing: 0.68rem;");
     declarations.push("--entry-spacing: 0.48rem;");
