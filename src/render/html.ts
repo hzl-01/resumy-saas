@@ -361,6 +361,31 @@ export function renderSkillsSection(items: ResumeSkillGroup[]): string {
   );
 }
 
+export function renderSkillsSectionPlain(items: ResumeSkillGroup[]): string {
+  if (items.length === 0) {
+    return "";
+  }
+
+  return renderSection(
+    "Skills",
+    `
+      <div class="skill-stack">
+        ${items
+          .map(
+            (skillGroup) => `
+              <div class="skill-group">
+                <p class="skill-group-title">${escapeHtml(skillGroup.name)}</p>
+                <p class="skill-group-items">${escapeHtml(skillGroup.items.join(", "))}</p>
+              </div>
+            `,
+          )
+          .join("")}
+      </div>
+    `,
+    "skills-section",
+  );
+}
+
 export function renderCustomSections(items: ResumeCustomSection[]): string {
   return items
     .filter((section) => section.items.length > 0)

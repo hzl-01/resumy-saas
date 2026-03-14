@@ -6,16 +6,16 @@ import {
 import { CliError } from "../errors.ts";
 import { renderPdf } from "../../output/pdf.ts";
 import { buildEmbeddedFontCss } from "../../render/fonts.ts";
-import { renderThemeCss } from "../../render/theme-css.ts";
 import { getTemplate } from "../../templates/index.ts";
-import { getTheme } from "../../themes/index.ts";
 
 export function registerGenerateCommand(cli: CAC): void {
   cli
     .command("generate <format>", "Generate a resume in one of the supported output formats.")
-    .option("-t, --template <template>", "Built-in resume layout to use.", {
-      default: "professional",
-    })
+    .option(
+      "--theme <name>",
+      "Resume theme (layout + style). Built-in themes: professional, minimal, classic.",
+      { default: "professional" },
+    )
     .option("-o, --output <file>", "Where to write the generated PDF file.")
     .option("--html-output <file>", "Optional path to also write the rendered HTML.")
     .option("--page-size <size>", "PDF page size: letter or a4.", {
@@ -27,13 +27,8 @@ export function registerGenerateCommand(cli: CAC): void {
       { default: "standard" },
     )
     .option(
-      "--theme <name>",
-      "Color theme to apply. Built-in themes: default, minimal, warm, dark.",
-      { default: "default" },
-    )
-    .option(
       "--theme-color <value>",
-      "Accent color override applied on top of the selected theme.",
+      "Accent color used for links, section headings, chips, and decorative borders.",
     )
     .option("--font-family <value>", "Body font family or CSS font-family stack.")
     .option(
@@ -102,7 +97,7 @@ export function registerGenerateCommand(cli: CAC): void {
     )
     .example(
       (bin) =>
-        `${bin} generate pdf --density compact --name "Jordan Lee" --title "Product Engineer" --experience "role=Senior Product Engineer;company=Northstar Labs" --experience-bullet "0|Built a design system" --skill-group "Languages|TypeScript, JavaScript, SQL" --output ./dist/resume-compact.pdf`,
+        `${bin} generate pdf --theme minimal --name "Jordan Lee" --title "Product Engineer" --experience "role=Senior Product Engineer;company=Northstar Labs" --experience-bullet "0|Built a design system" --skill-group "Languages|TypeScript, JavaScript, SQL" --output ./dist/resume-minimal.pdf`,
     )
     .action(async (format: string, options: GeneratePdfOptions) => {
       await handleGenerate(format, options);
@@ -126,26 +121,17 @@ export async function handleGenerate(
 
   if (!template) {
     throw new CliError(
-      `Unknown template "${request.templateId}". Run \`resume-cli templates\` to see the available built-in templates.`,
-    );
-  }
-
-  const theme = getTheme(request.theme.themeId);
-
-  if (!theme) {
-    throw new CliError(
-      `Unknown theme "${request.theme.themeId}". Built-in themes: default, minimal, warm, dark.`,
+      `Unknown theme "${request.templateId}". Built-in themes: professional, minimal, classic.`,
     );
   }
 
   const fontFaceCss = await buildEmbeddedFontCss(request.typography.fontFaces);
-  const themeCss = renderThemeCss(theme, "theme-professional", request.theme.accentColor);
   const renderedHtml = template.render(request.document, {
     density: request.density,
     fontFaceCss,
-    themeCss,
     bodyFontFamily: request.typography.bodyFontFamily,
     headingFontFamily: request.typography.headingFontFamily,
+    accentColor: request.theme.accentColor,
     sectionOrder: request.sectionOrder,
   });
 
@@ -156,7 +142,7 @@ export async function handleGenerate(
     pageSize: request.pageSize,
   });
 
-  console.log(`Generated ${template.label} at ${request.output}`);
+  console.log(`Generated ${template.label} resume at ${request.output}`);
   if (request.htmlOutput) {
     console.log(`Also wrote debug HTML to ${request.htmlOutput}`);
   }

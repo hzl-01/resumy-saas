@@ -59,7 +59,6 @@ export interface ResumeTypographyOptions {
 }
 
 export interface ResumeThemeOptions {
-  themeId: string;
   accentColor?: string;
 }
 
@@ -80,7 +79,7 @@ export interface PdfRenderRequest {
 export function buildPdfRenderRequest(
   options: GeneratePdfOptions,
 ): PdfRenderRequest {
-  const templateId = options.template ?? "professional";
+  const templateId = options.theme ?? options.template ?? "professional";
   const pageSize = normalizePageSize(options.pageSize);
   const density = normalizeDensity(options.density);
   const sectionOrder = parseSectionOrder(options.sectionOrder);
@@ -96,7 +95,6 @@ export function buildPdfRenderRequest(
     templateId,
     sectionOrder,
     theme: {
-      themeId: options.theme ?? "default",
       accentColor: normalizeCssValue(options.themeColor, "--theme-color"),
     },
     typography: {

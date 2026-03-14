@@ -18,6 +18,15 @@ import {
 
 const PROFESSIONAL_CSS = `
   body.theme-professional {
+    --page-bg: #eef2f7;
+    --surface: #ffffff;
+    --text: #172033;
+    --text-soft: #3b475d;
+    --muted: #617088;
+    --accent: #0b5fff;
+    --section-title: color-mix(in srgb, var(--accent) 82%, #0f172a);
+    --chip-bg: color-mix(in srgb, var(--accent) 10%, white);
+    --chip-text: color-mix(in srgb, var(--accent) 68%, #0f172a);
     --page-padding: 0.88in 0.74in 0.72in;
     --header-gap: 0.62rem;
     --header-padding-bottom: 0.68rem;
@@ -191,7 +200,7 @@ export const professionalTemplate: ResumeTemplate = {
     return renderDocument({
       pageTitle: `${resume.basics.name} | Resume`,
       bodyClass: "theme-professional",
-      css: [options?.fontFaceCss ?? "", options?.themeCss ?? "", renderTypographyCss(options), PROFESSIONAL_CSS]
+      css: [options?.fontFaceCss ?? "", renderTypographyCss(options), PROFESSIONAL_CSS]
         .filter(Boolean)
         .join("\n"),
       content: `
@@ -213,6 +222,10 @@ function renderTypographyCss(options?: ResumeTemplateRenderOptions): string {
 
   if (options?.headingFontFamily) {
     declarations.push(`--resume-heading-font: ${options.headingFontFamily};`);
+  }
+
+  if (options?.accentColor) {
+    declarations.push(`--accent: ${options.accentColor};`);
   }
 
   if (options?.density === "compact") {
