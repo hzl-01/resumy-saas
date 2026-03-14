@@ -9,7 +9,12 @@ import {
   renderSkillsSection,
   renderSummarySection,
 } from "../render/html.ts";
-import type { ResumeTemplate, ResumeTemplateRenderOptions } from "./template.ts";
+import {
+  DEFAULT_SECTION_ORDER,
+  type ResumeSectionKey,
+  type ResumeTemplate,
+  type ResumeTemplateRenderOptions,
+} from "./template.ts";
 
 const PROFESSIONAL_CSS = `
   body.theme-professional {
@@ -47,7 +52,6 @@ const PROFESSIONAL_CSS = `
     --chip-font-size: 0.82rem;
     --skill-stack-gap: 0.48rem;
     --skill-group-gap: 0.2rem;
-    --skills-education-gap: 0.88rem;
     font-family: var(--resume-body-font, "Avenir Next", "Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif);
     padding: 24px;
   }
@@ -122,17 +126,6 @@ const PROFESSIONAL_CSS = `
     margin-top: var(--entry-tech-margin-top);
   }
 
-  .theme-professional .skills-and-education {
-    display: grid;
-    grid-template-columns: minmax(0, 1.4fr) minmax(220px, 0.95fr);
-    gap: var(--skills-education-gap);
-    align-items: start;
-  }
-
-  .theme-professional .skills-and-education > * {
-    min-width: 0;
-  }
-
   .theme-professional .skills-section,
   .theme-professional .education-section,
   .theme-professional .custom-section,
@@ -168,11 +161,6 @@ const PROFESSIONAL_CSS = `
     .professional-shell {
       padding: 1.1rem;
     }
-
-    .theme-professional .skills-and-education {
-      grid-template-columns: 1fr;
-      gap: 0;
-    }
   }
 
   @media print {
@@ -185,14 +173,6 @@ const PROFESSIONAL_CSS = `
       padding: 0;
       box-shadow: none;
     }
-
-    .theme-professional .skills-and-education {
-      display: block;
-    }
-
-    .theme-professional .skills-and-education > .resume-section + .resume-section {
-      margin-top: var(--section-spacing);
-    }
   }
 `;
 
@@ -201,19 +181,19 @@ export const professionalTemplate: ResumeTemplate = {
   label: "Professional PDF",
   description: "A single-column, print-first resume layout optimized for PDF export.",
   render(resume: ResumeDocument, options?: ResumeTemplateRenderOptions): string {
-    const primarySections = [
-      renderSummarySection(resume.basics.summary),
-      renderExperienceSection(resume.experience),
-      renderProjectsSection(resume.projects),
-      renderCustomSections(resume.customSections),
-    ]
-      .filter(Boolean)
-      .join("\n");
+    const order = options?.sectionOrder ?? DEFAULT_SECTION_ORDER;
 
-    const secondarySections = [
-      renderSkillsSection(resume.skills),
-      renderEducationSection(resume.education),
-    ]
+    const sectionRenderers: Record<ResumeSectionKey, () => string> = {
+      summary: () => renderSummarySection(resume.basics.summary),
+      experience: () => renderExperienceSection(resume.experience),
+      projects: () => renderProjectsSection(resume.projects),
+      skills: () => renderSkillsSection(resume.skills),
+      education: () => renderEducationSection(resume.education),
+      custom: () => renderCustomSections(resume.customSections),
+    };
+
+    const renderedSections = order
+      .map((key) => sectionRenderers[key]())
       .filter(Boolean)
       .join("\n");
 
@@ -226,12 +206,7 @@ export const professionalTemplate: ResumeTemplate = {
       content: `
         <main class="page professional-shell">
           ${renderResumeHeader(resume)}
-          ${primarySections}
-          ${
-            secondarySections
-              ? `<section class="skills-and-education">${secondarySections}</section>`
-              : ""
-          }
+          ${renderedSections}
         </main>
       `,
     });
@@ -275,7 +250,6 @@ function renderTypographyCss(options?: ResumeTemplateRenderOptions): string {
     declarations.push("--chip-font-size: 0.74rem;");
     declarations.push("--skill-stack-gap: 0.3rem;");
     declarations.push("--skill-group-gap: 0.12rem;");
-    declarations.push("--skills-education-gap: 0.62rem;");
   }
 
   if (declarations.length === 0) {

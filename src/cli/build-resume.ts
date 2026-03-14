@@ -6,6 +6,11 @@ import type {
   ResumeProject,
   ResumeSkillGroup,
 } from "../domain/resume.ts";
+import {
+  DEFAULT_SECTION_ORDER,
+  type ResumeSectionKey,
+  VALID_SECTION_KEYS,
+} from "../templates/template.ts";
 import { CliError } from "./errors.ts";
 
 export interface GeneratePdfOptions {
@@ -36,6 +41,7 @@ export interface GeneratePdfOptions {
   educationHighlight?: string | string[];
   skillGroup?: string | string[];
   extra?: string | string[];
+  sectionOrder?: string;
 }
 
 export interface ResumeFontFace {
@@ -66,6 +72,7 @@ export interface PdfRenderRequest {
   templateId: string;
   theme: ResumeThemeOptions;
   typography: ResumeTypographyOptions;
+  sectionOrder: ResumeSectionKey[];
 }
 
 export function buildPdfRenderRequest(
@@ -74,6 +81,7 @@ export function buildPdfRenderRequest(
   const templateId = options.template ?? "professional";
   const pageSize = normalizePageSize(options.pageSize);
   const density = normalizeDensity(options.density);
+  const sectionOrder = parseSectionOrder(options.sectionOrder);
   const document = buildResumeDocument(options);
   const output = options.output ?? `resume.${templateId}.${pageSize}.pdf`;
 
@@ -84,6 +92,7 @@ export function buildPdfRenderRequest(
     density,
     pageSize,
     templateId,
+    sectionOrder,
     theme: {
       accentColor: normalizeCssValue(options.themeColor, "--theme-color"),
     },
@@ -494,6 +503,35 @@ function normalizeDensity(density: string | undefined): ResumeDensity {
   throw new CliError(
     `Unsupported density "${density}". Use \`standard\` or \`compact\`.`,
   );
+}
+
+function parseSectionOrder(
+  value: string | undefined,
+): ResumeSectionKey[] {
+  if (!value) {
+    return DEFAULT_SECTION_ORDER;
+  }
+
+  const keys = value
+    .split(",")
+    .map((k) => k.trim().toLowerCase())
+    .filter(Boolean);
+
+  if (keys.length === 0) {
+    throw new CliError(
+      `--section-order must contain at least one section key. Valid keys: ${[...VALID_SECTION_KEYS].join(", ")}.`,
+    );
+  }
+
+  for (const key of keys) {
+    if (!VALID_SECTION_KEYS.has(key)) {
+      throw new CliError(
+        `Unknown section key "${key}" in --section-order. Valid keys: ${[...VALID_SECTION_KEYS].join(", ")}.`,
+      );
+    }
+  }
+
+  return keys as ResumeSectionKey[];
 }
 
 function normalizeCssValue(

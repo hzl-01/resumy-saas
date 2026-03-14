@@ -85,6 +85,10 @@ export function registerGenerateCommand(cli: CAC): void {
       "--extra <title|item>",
       "Extra resume item grouped under a custom section title. Repeatable.",
     )
+    .option(
+      "--section-order <csv>",
+      "Comma-separated section order. Valid keys: summary, experience, projects, skills, education, custom. Default: summary,experience,projects,custom,skills,education.",
+    )
     .example(
       (bin) =>
         `${bin} generate pdf --name "Jordan Lee" --title "Product Engineer" --theme-color "#0f766e" --font-family '"IBM Plex Sans", "Segoe UI", sans-serif' --experience "role=Senior Product Engineer;company=Northstar Labs;start=2022;end=Present;location=Remote" --experience-bullet "0|Built a design system" --skill-group "Languages|TypeScript, JavaScript, SQL" --output ./dist/resume.pdf`,
@@ -126,6 +130,7 @@ export async function handleGenerate(
     bodyFontFamily: request.typography.bodyFontFamily,
     headingFontFamily: request.typography.headingFontFamily,
     accentColor: request.theme.accentColor,
+    sectionOrder: request.sectionOrder,
   });
 
   await renderPdf({
