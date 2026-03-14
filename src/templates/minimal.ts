@@ -9,7 +9,7 @@ import {
   renderSkillsSectionPlain,
   renderSummarySection,
 } from "../render/html.ts";
-import { getSectionLabels } from "../render/i18n.ts";
+import { CJK_SANS_FONT_STACK, getSectionLabels, isCjkLanguage } from "../render/i18n.ts";
 import {
   DEFAULT_SECTION_ORDER,
   type ResumeSectionKey,
@@ -192,6 +192,7 @@ export const minimalTemplate: ResumeTemplate = {
     return renderDocument({
       pageTitle: `${resume.basics.name} | Resume`,
       bodyClass: "theme-minimal",
+      language: options?.language,
       css: [options?.fontFaceCss ?? "", MINIMAL_CSS, renderMinimalTypographyCss(options)]
         .filter(Boolean)
         .join("\n"),
@@ -218,6 +219,10 @@ function renderMinimalTypographyCss(options?: ResumeTemplateRenderOptions): stri
 
   if (options?.accentColor) {
     declarations.push(`--accent: ${options.accentColor};`);
+  }
+
+  if (isCjkLanguage(options?.language ?? "en") && !options?.bodyFontFamily) {
+    declarations.push(`--resume-body-font: ${CJK_SANS_FONT_STACK};`);
   }
 
   if (options?.density === "compact") {

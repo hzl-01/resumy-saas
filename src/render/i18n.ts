@@ -64,3 +64,12 @@ export const SUPPORTED_LANGUAGES = Object.keys(translations);
 export function getSectionLabels(language: string): SectionLabels {
   return translations[language] ?? translations.en!;
 }
+
+const CJK_LANGUAGES = new Set(["zh", "ja", "ko"]);
+
+export function isCjkLanguage(language: string): boolean {
+  return CJK_LANGUAGES.has(language);
+}
+
+export const CJK_SANS_FONT_STACK =
+  '"PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", "Microsoft YaHei", "Source Han Sans SC", sans-serif';

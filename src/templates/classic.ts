@@ -9,7 +9,7 @@ import {
   renderSkillsSection,
   renderSummarySection,
 } from "../render/html.ts";
-import { getSectionLabels } from "../render/i18n.ts";
+import { CJK_SANS_FONT_STACK, getSectionLabels, isCjkLanguage } from "../render/i18n.ts";
 import {
   DEFAULT_SECTION_ORDER,
   type ResumeSectionKey,
@@ -26,8 +26,8 @@ const CLASSIC_CSS = `
     --muted: #777777;
     --accent: #8b4513;
     --section-title: var(--accent);
-    --chip-bg: #f5ede4;
-    --chip-text: #5a3a1a;
+    --chip-bg: color-mix(in srgb, var(--accent) 10%, white);
+    --chip-text: color-mix(in srgb, var(--accent) 68%, #1a1a1a);
     --page-padding: 0.72in 0.82in 0.68in;
     font-family: var(--resume-body-font, "Georgia", "Palatino Linotype", "Book Antiqua", "Times New Roman", serif);
     padding: 24px;
@@ -279,6 +279,7 @@ export const classicTemplate: ResumeTemplate = {
     return renderDocument({
       pageTitle: `${resume.basics.name} | Resume`,
       bodyClass: "theme-classic",
+      language: options?.language,
       css: [options?.fontFaceCss ?? "", CLASSIC_CSS, renderClassicTypographyCss(options)]
         .filter(Boolean)
         .join("\n"),
@@ -305,6 +306,11 @@ function renderClassicTypographyCss(options?: ResumeTemplateRenderOptions): stri
 
   if (options?.accentColor) {
     declarations.push(`--accent: ${options.accentColor};`);
+  }
+
+  if (isCjkLanguage(options?.language ?? "en") && !options?.bodyFontFamily) {
+    declarations.push(`--resume-body-font: ${CJK_SANS_FONT_STACK};`);
+    declarations.push(`--resume-heading-font: ${CJK_SANS_FONT_STACK};`);
   }
 
   if (options?.density === "compact") {

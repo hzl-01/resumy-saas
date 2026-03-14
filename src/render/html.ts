@@ -216,6 +216,31 @@ const BASE_CSS = `
       text-decoration: none;
     }
   }
+
+  :lang(zh) .section-title,
+  :lang(ja) .section-title,
+  :lang(ko) .section-title {
+    font-weight: 900;
+    letter-spacing: 0.08em;
+  }
+
+  :lang(zh) .resume-name,
+  :lang(ja) .resume-name,
+  :lang(ko) .resume-name {
+    font-weight: 900;
+  }
+
+  :lang(zh) .entry-title,
+  :lang(ja) .entry-title,
+  :lang(ko) .entry-title {
+    font-weight: 800;
+  }
+
+  :lang(zh) .skill-group-title,
+  :lang(ja) .skill-group-title,
+  :lang(ko) .skill-group-title {
+    font-weight: 800;
+  }
 `;
 
 export function renderDocument(params: {
@@ -223,12 +248,13 @@ export function renderDocument(params: {
   bodyClass: string;
   css: string;
   content: string;
+  language?: string;
 }): string {
-  const { pageTitle, bodyClass, css, content } = params;
+  const { pageTitle, bodyClass, css, content, language } = params;
 
   return [
     "<!doctype html>",
-    `<html lang="en">`,
+    `<html lang="${escapeAttribute(language ?? "en")}">`,
     "<head>",
     '  <meta charset="utf-8" />',
     '  <meta name="viewport" content="width=device-width, initial-scale=1" />',
