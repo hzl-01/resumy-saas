@@ -12,6 +12,23 @@
 bun add -g resumy
 ```
 
+## 安装 Agent Skill
+
+这个仓库也包含给 `skills` 安装器使用的 `agent-resume` skill。
+
+从 GitHub 安装：
+
+```bash
+bunx skills add https://github.com/ahpxex/resume-cli --skill agent-resume
+```
+
+本地开发时可以这样查看和安装：
+
+```bash
+bunx skills add . --list
+bunx skills add . --skill agent-resume
+```
+
 ## 快速开始
 
 查看内置模板：

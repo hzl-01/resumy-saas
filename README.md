@@ -12,6 +12,23 @@ Install `resumy` globally with Bun:
 bun add -g resumy
 ```
 
+## Install The Agent Skill
+
+This repository also ships the `agent-resume` skill for the `skills` installer.
+
+Install it from GitHub:
+
+```bash
+bunx skills add https://github.com/ahpxex/resume-cli --skill agent-resume
+```
+
+Inspect locally during development:
+
+```bash
+bunx skills add . --list
+bunx skills add . --skill agent-resume
+```
+
 ## Quick Start
 
 List the built-in templates:
