@@ -3,6 +3,10 @@
   "version": "0.1.0",
   "description": "Bun-first CLI for generating polished resume PDFs from structured flags and built-in templates.",
   "license": "MCP",
+  "homepage": "https://github.com/ahpxex/resume-cli#readme",
+  "bugs": {
+    "url": "https://github.com/ahpxex/resume-cli/issues"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/ahpxex/resume-cli.git"
@@ -25,6 +29,9 @@
   ],
   "bin": {
     "resumy": "dist/npm/index.js"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "start": "bun run index.ts",

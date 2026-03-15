@@ -1,8 +1,12 @@
 # resumy
 
-English README. For Chinese documentation, see [README.zh-CN.md](https://github.com/ahpxex/resume-cli/blob/main/README.zh-CN.md).
+English README / [中文文档](https://github.com/ahpxex/resume-cli/blob/main/README.zh-CN.md).
 
 `resumy` is a Bun-first CLI for generating polished resumes from structured flags and built-in templates. It is designed to stay scriptable, deterministic, and friendly to agents or power users who prefer explicit command input over interactive flows.
+
+## Demo
+
+<video src="./assets/demo.mp4" controls muted playsinline width="100%"></video>
 
 ## Install
 
@@ -10,7 +14,25 @@ Install `resumy` globally with Bun:
 
 ```bash
 bun add -g resumy
+bun install -g resumy
 ```
+
+After installation, the global command is:
+
+```bash
+resumy --help
+```
+
+## Publish To npm
+
+Publish the package publicly to npm:
+
+```bash
+npm login
+npm publish
+```
+
+Once published, other users can install it globally with Bun and call `resumy` directly.
 
 ## Install The Agent Skill
 
@@ -120,4 +142,5 @@ bun install
 bun run check
 bun test
 bun run build
+npm publish --dry-run
 ```

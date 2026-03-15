@@ -4,13 +4,35 @@
 
 `resumy` 是一个以 Bun 为优先运行时的 CLI，用来通过结构化命令参数和内置模板生成排版稳定的简历 PDF。它的定位是可脚本化、可重复、适合自动化流程和 agent 场景，而不是交互式向导。
 
+## Demo
+
+<video src="./assets/demo.mp4" controls muted playsinline width="100%"></video>
+
 ## 安装
 
 使用 Bun 全局安装：
 
 ```bash
 bun add -g resumy
+bun install -g resumy
 ```
+
+安装后可直接全局调用：
+
+```bash
+resumy --help
+```
+
+## 发布到 npm
+
+公开发布到 npm：
+
+```bash
+npm login
+npm publish
+```
+
+发布完成后，别人就可以用 Bun 全局安装，并直接执行 `resumy`。
 
 ## 安装 Agent Skill
 
@@ -121,4 +143,5 @@ bun install
 bun run check
 bun test
 bun run build
+npm publish --dry-run
 ```
