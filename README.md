@@ -3,11 +3,7 @@
 English README / [中文文档](https://github.com/ahpxex/resume-cli/blob/main/README.zh-CN.md).
 
 `resumy` is a Bun-first CLI for generating polished resumes from structured flags and built-in templates. It is designed to stay scriptable, deterministic, and friendly to agents or power users who prefer explicit command input over interactive flows.
-
-## Demo
-
-<video src="./assets/demo.mp4" controls muted playsinline width="100%"></video>
-
+zh
 ## Install
 
 Install `resumy` globally with Bun:
