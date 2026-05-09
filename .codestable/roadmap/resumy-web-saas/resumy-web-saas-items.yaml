@@ -21,8 +21,8 @@ items:
   - slug: resume-crud-api
     description: 简历 CRUD API + 数据库存储，复用 normalizeResumeDocument 校验
     depends_on: [backend-scaffold-auth]
-    status: planned
-    feature: null
+    status: done
+    feature: 2026-05-09-resume-crud-api
     minimal_loop: false
     notes: 数据校验复用现有 src/schema/resume.ts
 

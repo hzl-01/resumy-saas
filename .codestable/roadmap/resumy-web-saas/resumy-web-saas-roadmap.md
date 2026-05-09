@@ -254,10 +254,10 @@ Response: { resume: { id, name, data: ResumeDocument, updated_at }, warnings?: s
 
 3. **resume-crud-api** — 简历 CRUD API + 数据库存储
    - 所属模块：Web Server Module
-   - 依赖：[backend-web-auth]
-   - 状态：planned
-   - 对应 feature：未启动
-   - 备注：复用 `src/schema/resume.ts` 的 `normalizeResumeDocument` 校验数据
+   - 依赖：[backend-scaffold-auth]
+   - 状态：done
+   - 对应 feature：2026-05-09-resume-crud-api
+   - 备注：数据校验复用现有 src/schema/resume.ts 的 normalizeResumeDocument
 
 4. **pdf-gen-api** — PDF 生成 API（直接对接现有渲染引擎）
    - 所属模块：Web Server Module + Core Engine
