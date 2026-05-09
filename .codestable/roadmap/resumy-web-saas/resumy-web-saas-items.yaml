@@ -13,10 +13,10 @@ items:
   - slug: user-auth-frontend
     description: 前端登录/注册页面
     depends_on: [backend-scaffold-auth]
-    status: planned
-    feature: null
+    status: done
+    feature: 2026-05-09-user-auth-frontend
     minimal_loop: false
-    notes: null
+    notes: 原生 HTML/CSS/JS SPA，无前端框架
 
   - slug: resume-crud-api
     description: 简历 CRUD API + 数据库存储，复用 normalizeResumeDocument 校验

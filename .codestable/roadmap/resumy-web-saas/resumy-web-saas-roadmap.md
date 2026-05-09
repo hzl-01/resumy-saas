@@ -247,10 +247,10 @@ Response: { resume: { id, name, data: ResumeDocument, updated_at }, warnings?: s
 
 2. **user-auth-frontend** — 前端登录/注册页面
    - 所属模块：Frontend SPA
-   - 依赖：[backend-web-auth]
-   - 状态：planned
-   - 对应 feature：未启动
-   - 备注：前端技术栈待定；服务端渲染 vs SPA
+   - 依赖：[backend-scaffold-auth]
+   - 状态：done
+   - 对应 feature：2026-05-09-user-auth-frontend
+   - 备注：原生 HTML/CSS/JS SPA，零前端框架
 
 3. **resume-crud-api** — 简历 CRUD API + 数据库存储
    - 所属模块：Web Server Module

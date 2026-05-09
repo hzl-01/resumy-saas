@@ -42,8 +42,10 @@ resumy — 基于 Bun + TypeScript 的简历 PDF 生成 CLI。通过结构化命
 
 ### Web 服务模块 (`src/web/`)
 - `server.ts` — HTTP 服务启动 + 路由分发（Bun.serve）
+  - 路由顺序：`/api/auth/*` 优先 → `/static/*` 静态文件 → 404
 - `auth/` — 用户认证 handlers（register / login / me，JWT + bcrypt）
 - `db/` — 数据库层（SQLite，bun:sqlite，自动建 users 表）
+- `static/` — 前端 SPA 静态资源（index.html, app.js, spa-utils.js, style.css）
 
 ### IO 层 (`src/io/`)
 - `files.ts` — 文件读写工具函数

@@ -1,0 +1,135 @@
+feature: 2026-05-09-user-auth-frontend
+created: 2026-05-09
+
+steps:
+  - action: "静态文件服务：在 server.ts 添加 handleStaticRoute() 读取 src/web/static/ 下的文件"
+    exit_signal: "浏览器访问 http://localhost:3000/ 返回 index.html 内容"
+    status: done
+
+  - action: "SPA 骨架 + login 视图：index.html 三视图占位 + spa-utils.js 工具函数 + app.js init() 检查 token"
+    exit_signal: "打开页面看到登录表单，可输入并提交"
+    status: done
+
+  - action: "Register 视图：注册表单 + 提交逻辑 + POST /api/auth/register"
+    exit_signal: "填写 email/password/name → 注册成功 → 自动登录 → dashboard"
+    status: done
+
+  - action: "Dashboard + logout：显示用户名称 + 登出按钮"
+    exit_signal: "登录后看到'你好，{name}' + 登出按钮 → 点击后回到 login"
+    status: done
+
+  - action: "样式打磨：style.css 美化，全局配色，表单聚焦、错误提示"
+    exit_signal: "页面视觉基本可用，与 CLI 风格协调"
+    status: done
+
+checks:
+  - item: "首次访问 http://localhost:3000 看到登录页面"
+    source: 验收场景 #1
+    status: passed
+
+  - item: "注册成功 → JWT 存入 localStorage → 自动跳转仪表盘"
+    source: 验收场景 #2
+    status: passed
+
+  - item: "登录成功 → JWT 存入 localStorage → 跳转仪表盘"
+    source: 验收场景 #3
+    status: passed
+
+  - item: "仪表盘显示'你好，{name}' + 登出按钮"
+    source: 验收场景 #4
+    status: passed
+
+  - item: "登出清除 JWT → 回到登录页"
+    source: 验收场景 #5
+    status: passed
+
+  - item: "已登录用户 F5 刷新 → 直接显示仪表盘"
+    source: 验收场景 #6
+    status: passed
+
+  - item: "token 过期 → 401 → 清除 token → 显示登录页"
+    source: 验收场景 #7
+    status: passed
+
+  - item: "注册已存在邮箱 → 400 email_exists → 红色错误消息"
+    source: 验收场景 #8
+    status: passed
+
+  - item: "登录错误密码 → 401 → 红色错误消息"
+    source: 验收场景 #9
+    status: passed
+
+  - item: "登录页 ↔ 注册页切换链接正常工作"
+    source: 验收场景 #10 / #11
+    status: passed
+
+  - item: "DOM 中无外部 CDN 引用"
+    source: 范围守护 — 不引入前端框架
+    status: passed
+
+  - item: "登出后 localStorage 无 jwt_token 残留"
+    source: 范围守护 — 反向核对
+    status: passed
+
+  - item: "无前端构建配置文件出现"
+    source: 范围守护 — 原生 HTML/CSS/JS
+    status: passed
+
+  - item: "API 路由优先于静态路由：/api/auth/* 不受影响"
+    source: 流程级约束
+    status: passed
+  - item: "首次访问 http://localhost:3000 看到登录页面"
+    source: 验收场景 #1
+    status: done
+
+  - item: "注册成功 → JWT 存入 localStorage → 自动跳转仪表盘"
+    source: 验收场景 #2
+    status: done
+
+  - item: "登录成功 → JWT 存入 localStorage → 跳转仪表盘"
+    source: 验收场景 #3
+    status: done
+
+  - item: "仪表盘显示'你好，{name}' + 登出按钮"
+    source: 验收场景 #4
+    status: done
+
+  - item: "登出清除 JWT → 回到登录页"
+    source: 验收场景 #5
+    status: done
+
+  - item: "已登录用户 F5 刷新 → 直接显示仪表盘"
+    source: 验收场景 #6
+    status: done
+
+  - item: "token 过期 → 401 → 清除 token → 显示登录页"
+    source: 验收场景 #7
+    status: done
+
+  - item: "注册已存在邮箱 → 400 email_exists → 红色错误消息"
+    source: 验收场景 #8
+    status: done
+
+  - item: "登录错误密码 → 401 → 红色错误消息"
+    source: 验收场景 #9
+    status: done
+
+  - item: "登录页 ↔ 注册页切换链接正常工作"
+    source: 验收场景 #10 / #11
+    status: done
+
+  - item: "DOM 中无外部 CDN 引用"
+    source: 范围守护 — 不引入前端框架
+    status: done
+
+  - item: "登出后 localStorage 无 jwt_token 残留"
+    source: 范围守护 — 反向核对
+    status: done
+
+  - item: "无前端构建配置文件出现"
+    source: 范围守护 — 原生 HTML/CSS/JS
+    status: done
+
+  - item: "API 路由优先于静态路由：/api/auth/* 不受影响"
+    source: 流程级约束
+    status: done

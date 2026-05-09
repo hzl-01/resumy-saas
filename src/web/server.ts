@@ -1,6 +1,16 @@
 import { initDb, type Database } from "./db/schema.ts";
 import { registerAuthRoutes, type AuthDependencies } from "./auth/handlers.ts";
 
+const STATIC_DIR = import.meta.dir ? import.meta.dir + "/static" : "./src/web/static";
+
+const MIME_TYPES: Record<string, string> = {
+  ".html": "text/html; charset=utf-8",
+  ".js": "application/javascript; charset=utf-8",
+  ".css": "text/css; charset=utf-8",
+  ".png": "image/png",
+  ".svg": "image/svg+xml",
+};
+
 export interface ServeOptions {
   port: number;
   host: string;
@@ -23,6 +33,9 @@ export async function startServer(options: ServeOptions): Promise<void> {
 
       const authResult = await handleAuthRoute(method, url.pathname, request, deps);
       if (authResult) return authResult;
+
+      const staticResult = await handleStaticRoute(url.pathname);
+      if (staticResult) return staticResult;
 
       return new Response("Not Found", { status: 404 });
     },
@@ -56,4 +69,26 @@ async function handleAuthRoute(
     return registerAuthRoutes.me(request, deps);
   }
   return null;
+}
+
+async function handleStaticRoute(pathname: string): Promise<Response | null> {
+  let relativePath: string;
+  if (pathname === "/") {
+    relativePath = "/index.html";
+  } else if (pathname.startsWith("/static/")) {
+    relativePath = pathname.slice(7);
+  } else {
+    return null;
+  }
+
+  const filePath = STATIC_DIR + relativePath;
+  const file = Bun.file(filePath);
+  const exists = await file.exists();
+  if (!exists) return null;
+
+  const ext = filePath.substring(filePath.lastIndexOf("."));
+  const contentType = MIME_TYPES[ext] || "application/octet-stream";
+  return new Response(file, {
+    headers: { "Content-Type": contentType },
+  });
 }
