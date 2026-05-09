@@ -3,6 +3,7 @@ import packageJson from "../../package.json" with { type: "json" };
 import { formatCliError } from "./errors.ts";
 import { registerGenerateCommand } from "./commands/generate.ts";
 import { registerTemplatesCommand } from "./commands/templates.ts";
+import { registerServeCommand } from "./commands/serve.ts";
 
 const CLI_VERSION = packageJson.version;
 
@@ -43,6 +44,7 @@ function createCli() {
 
   registerGenerateCommand(cli);
   registerTemplatesCommand(cli);
+  registerServeCommand(cli);
 
   return cli;
 }

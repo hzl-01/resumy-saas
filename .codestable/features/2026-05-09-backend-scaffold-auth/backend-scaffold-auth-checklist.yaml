@@ -1,0 +1,52 @@
+feature: 2026-05-09-backend-scaffold-auth
+created: 2026-05-09
+
+steps:
+  - action: "编排骨架：注册 serve 命令 + Bun.serve 空服务器启动 + 关闭"
+    exit_signal: "resumy serve --port 3099 启动后 curl localhost:3099 返回响应"
+    status: done
+
+  - action: "数据库层：SQLite 初始化 + users 表自动建表 + 用户 CRUD 函数"
+    exit_signal: "数据库文件创建，插入一条用户数据可查询"
+    status: done
+
+  - action: "Auth 计算节点：register / login / me handler + JWT 生成"
+    exit_signal: "curl 注册 → 登录 → /me 三合一流程跑通"
+    status: done
+
+  - action: "JWT 中间件：Authorization 提取 + 验证 + 错误返回"
+    exit_signal: "无 token 请求 401，无效 token 401，有效 token 正常访问"
+    status: done
+
+  - action: "测试覆盖：补齐关键场景清单所有条目"
+    exit_signal: "所有验收场景有可观察证据"
+    status: done
+
+checks:
+  - item: "resumy serve 启动后监听指定端口"
+    source: 验收场景
+    status: passed
+
+  - item: "POST /api/auth/register 重复 email 返回 400 email_exists"
+    source: 验收场景
+    status: passed
+
+  - item: "POST /api/auth/login 错误密码返回 401 invalid_credentials"
+    source: 验收场景
+    status: passed
+
+  - item: "GET /api/auth/me 无 token 返回 401 unauthorized"
+    source: 验收场景
+    status: passed
+
+  - item: "GET /api/auth/me 有效 token 返回用户信息"
+    source: 验收场景
+    status: passed
+
+  - item: "配置同时支持 CLI flag 和环境变量"
+    source: 名词契约
+    status: passed
+
+  - item: "数据库文件按 --db 参数或 RESUMY_DB 环境变量创建"
+    source: 名词契约
+    status: passed

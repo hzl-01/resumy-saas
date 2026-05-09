@@ -1,0 +1,75 @@
+roadmap: resumy-web-saas
+created: 2026-05-09
+
+items:
+  - slug: backend-scaffold-auth
+    description: 后端项目骨架 + 用户注册/登录/认证 API
+    depends_on: []
+    status: done
+    feature: 2026-05-09-backend-scaffold-auth
+    minimal_loop: false
+    notes: Bun + TypeScript，JWT + bcrypt
+
+  - slug: user-auth-frontend
+    description: 前端登录/注册页面
+    depends_on: [backend-scaffold-auth]
+    status: planned
+    feature: null
+    minimal_loop: false
+    notes: null
+
+  - slug: resume-crud-api
+    description: 简历 CRUD API + 数据库存储，复用 normalizeResumeDocument 校验
+    depends_on: [backend-scaffold-auth]
+    status: planned
+    feature: null
+    minimal_loop: false
+    notes: 数据校验复用现有 src/schema/resume.ts
+
+  - slug: pdf-gen-api
+    description: PDF 生成 API，对接现有模板渲染 + Playwright PDF 引擎
+    depends_on: [resume-crud-api]
+    status: planned
+    feature: null
+    minimal_loop: false
+    notes: 需将现有 resumy 核心打包为可 import 的库
+
+  - slug: resume-form-editor
+    description: 在线简历编辑表单页面，覆盖 ResumeDocument 所有字段
+    depends_on: [user-auth-frontend, resume-crud-api]
+    status: planned
+    feature: null
+    minimal_loop: false
+    notes: 支持多段 experience/education/project 增删
+
+  - slug: template-preview-download
+    description: 模板选择、预览、PDF 下载页面
+    depends_on: [resume-form-editor, pdf-gen-api]
+    status: planned
+    feature: null
+    minimal_loop: true
+    notes: 最小闭环的最后一步
+
+  - slug: file-import-api
+    description: 文件上传 + docx/PDF 解析 API
+    depends_on: [resume-crud-api]
+    status: planned
+    feature: null
+    minimal_loop: false
+    notes: docx 用现成库解析，PDF 解析方案待调研
+
+  - slug: file-import-ui
+    description: 文件上传导入的 UI 界面，拖拽上传 + 解析预览
+    depends_on: [file-import-api, user-auth-frontend]
+    status: planned
+    feature: null
+    minimal_loop: false
+    notes: null
+
+  - slug: deployment-infra
+    description: 部署基础设施，后端（含 Playwright Chromium）+ 前端静态托管 + 数据库
+    depends_on: [backend-scaffold-auth, user-auth-frontend]
+    status: planned
+    feature: null
+    minimal_loop: false
+    notes: 可在最小闭环打通后安排
