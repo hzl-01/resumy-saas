@@ -29,10 +29,10 @@ items:
   - slug: pdf-gen-api
     description: PDF 生成 API，对接现有模板渲染 + Playwright PDF 引擎
     depends_on: [resume-crud-api]
-    status: planned
-    feature: null
+    status: done
+    feature: 2026-05-09-pdf-gen-api
     minimal_loop: false
-    notes: 需将现有 resumy 核心打包为可 import 的库
+    notes: Bun 不兼容 Playwright，通过 Node.js 子进程 + Bun.spawn 绕开；默认模板渲染
 
   - slug: resume-form-editor
     description: 在线简历编辑表单页面，覆盖 ResumeDocument 所有字段

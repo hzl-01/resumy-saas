@@ -262,9 +262,9 @@ Response: { resume: { id, name, data: ResumeDocument, updated_at }, warnings?: s
 4. **pdf-gen-api** — PDF 生成 API（直接对接现有渲染引擎）
    - 所属模块：Web Server Module + Core Engine
    - 依赖：[resume-crud-api]
-   - 状态：planned
-   - 对应 feature：未启动
-   - 备注：直接 import `src/templates/`、`src/render/`、`src/output/pdf.ts`，无需打包；需服务端配置 Chromium
+   - 状态：done
+   - 对应 feature：2026-05-09-pdf-gen-api
+   - 备注：Bun 不兼容 Playwright，通过 Node.js 子进程 + Bun.spawn 绕开
 
 5. **resume-form-editor** — 在线简历编辑表单页面
    - 所属模块：Frontend SPA

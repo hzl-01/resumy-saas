@@ -1,6 +1,7 @@
 import { initDb, type Database } from "./db/schema.ts";
 import { registerAuthRoutes, type AuthDependencies } from "./auth/handlers.ts";
 import { resumeRoutes, type ResumeDeps } from "./resume/handlers.ts";
+import { pdfRoutes, type PdfDeps } from "./pdf/handlers.ts";
 
 const STATIC_DIR = import.meta.dir ? import.meta.dir + "/static" : "./src/web/static";
 
@@ -34,6 +35,9 @@ export async function startServer(options: ServeOptions): Promise<void> {
 
       const authResult = await handleAuthRoute(method, url.pathname, request, deps);
       if (authResult) return authResult;
+
+      const pdfResult = await handlePdfRoute(method, url.pathname, request, deps);
+      if (pdfResult) return pdfResult;
 
       const resumeResult = await handleResumeRoute(method, url.pathname, request, deps);
       if (resumeResult) return resumeResult;
@@ -98,6 +102,32 @@ async function handleResumeRoute(
   if (pathname.startsWith("/api/resumes/") && method === "DELETE") {
     return resumeRoutes.delete(request, rdeps, pathname.slice(13));
   }
+  return null;
+}
+
+async function handlePdfRoute(
+  method: string,
+  pathname: string,
+  request: Request,
+  deps: AuthDependencies,
+): Promise<Response | null> {
+  const pdeps: PdfDeps = { db: deps.db, jwtSecret: deps.jwtSecret || "dev-secret" };
+
+  const generateMatch = pathname.match(/^\/api\/resumes\/([^\/]+)\/generate$/);
+  if (generateMatch && method === "POST") {
+    return pdfRoutes.generate(request, pdeps, generateMatch[1]);
+  }
+
+  const statusMatch = pathname.match(/^\/api\/resumes\/([^\/]+)\/generate\/([^\/]+)\/status$/);
+  if (statusMatch && method === "GET") {
+    return pdfRoutes.status(request, pdeps, statusMatch[1], statusMatch[2]);
+  }
+
+  const downloadMatch = pathname.match(/^\/api\/resumes\/([^\/]+)\/generate\/([^\/]+)\/download$/);
+  if (downloadMatch && method === "GET") {
+    return pdfRoutes.download(request, pdeps, downloadMatch[1], downloadMatch[2]);
+  }
+
   return null;
 }
 

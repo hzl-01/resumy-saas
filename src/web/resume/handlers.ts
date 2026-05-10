@@ -53,7 +53,7 @@ async function handleCreate(request: Request, deps: ResumeDeps): Promise<Respons
   let data: Record<string, unknown>;
   try {
     data = body.data as Record<string, unknown>;
-    normalizeResumeDocument(data);
+    data = normalizeResumeDocument(data) as unknown as Record<string, unknown>;
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : "Invalid resume data";
     return json(400, { error: "invalid_input", message: msg });
@@ -101,7 +101,7 @@ async function handleUpdate(request: Request, deps: ResumeDeps, id: string): Pro
   if (body.data !== undefined) {
     try {
       dataObj = body.data as Record<string, unknown>;
-      normalizeResumeDocument(dataObj);
+      dataObj = normalizeResumeDocument(dataObj) as unknown as Record<string, unknown>;
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : "Invalid resume data";
       return json(400, { error: "invalid_input", message: msg });
