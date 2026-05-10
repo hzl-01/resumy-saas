@@ -22,9 +22,7 @@
         <input id="login-password" type="password" placeholder="输入密码">
       </div>
       <button id="login-btn" class="btn btn-primary">登录</button>
-      <div class="footer-link">
-        没有账号？<a id="goto-register">注册</a>
-      </div>
+      <div class="footer-link">没有账号？<a id="goto-register">注册</a></div>
     </div>
 
     <div id="view-register" class="view card">
@@ -43,9 +41,7 @@
         <input id="reg-password" type="password" placeholder="至少 6 位">
       </div>
       <button id="register-btn" class="btn btn-primary">注册</button>
-      <div class="footer-link">
-        已有账号？<a id="goto-login">登录</a>
-      </div>
+      <div class="footer-link">已有账号？<a id="goto-login">登录</a></div>
     </div>
 
     <div id="view-dashboard" class="view card">
@@ -53,9 +49,51 @@
         <h1>你好，<span id="user-name"></span></h1>
         <button id="logout-btn" class="btn btn-danger">退出</button>
       </div>
-      <p style="color:#888;font-size:14px;text-align:center;padding:32px 0;">
-        简历管理功能即将上线
-      </p>
+      <div id="resume-list"></div>
+      <button id="new-resume-btn" class="btn btn-primary" style="margin-top:16px">+ 新建简历</button>
+    </div>
+
+    <div id="view-editor" class="view card">
+      <div class="dashboard-header">
+        <h1 id="editor-title">编辑简历</h1>
+        <div>
+          <button id="editor-back-btn" class="btn" style="width:auto;padding:8px 16px;font-size:13px;background:#eee;margin-right:8px">返回</button>
+          <button id="editor-save-btn" class="btn btn-primary" style="width:auto;padding:8px 16px;font-size:13px">保存</button>
+        </div>
+      </div>
+      <div id="editor-loading" style="text-align:center;padding:32px;color:#888">加载中...</div>
+      <div id="editor-form" style="display:none">
+        <h2 class="section-title">基本信息</h2>
+        <div class="form-group"><label>姓名</label><input id="ed-name" type="text"></div>
+        <div class="form-group"><label>标题</label><input id="ed-title" type="text"></div>
+        <div class="form-group"><label>邮箱</label><input id="ed-email" type="email"></div>
+        <div class="form-group"><label>电话</label><input id="ed-phone" type="text"></div>
+        <div class="form-group"><label>地址</label><input id="ed-location" type="text"></div>
+        <div class="form-group"><label>网站</label><input id="ed-website" type="text"></div>
+        <div class="form-group"><label>简介</label><textarea id="ed-summary" rows="3"></textarea></div>
+
+        <h2 class="section-title">工作经历</h2>
+        <div id="ed-experience"></div>
+        <button class="btn btn-secondary add-btn" data-section="experience">+ 添加工作经历</button>
+
+        <h2 class="section-title">教育经历</h2>
+        <div id="ed-education"></div>
+        <button class="btn btn-secondary add-btn" data-section="education">+ 添加教育经历</button>
+
+        <h2 class="section-title">项目</h2>
+        <div id="ed-projects"></div>
+        <button class="btn btn-secondary add-btn" data-section="projects">+ 添加项目</button>
+
+        <h2 class="section-title">技能</h2>
+        <div id="ed-skills"></div>
+        <button class="btn btn-secondary add-btn" data-section="skills">+ 添加技能组</button>
+
+        <h2 class="section-title">自定义板块</h2>
+        <div id="ed-custom"></div>
+        <button class="btn btn-secondary add-btn" data-section="custom">+ 添加自定义板块</button>
+
+        <button id="editor-delete-btn" class="btn btn-danger" style="margin-top:24px;width:auto;padding:8px 16px;font-size:13px">删除此简历</button>
+      </div>
     </div>
   </div>
 

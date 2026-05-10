@@ -37,10 +37,10 @@ items:
   - slug: resume-form-editor
     description: 在线简历编辑表单页面，覆盖 ResumeDocument 所有字段
     depends_on: [user-auth-frontend, resume-crud-api]
-    status: planned
-    feature: null
+    status: done
+    feature: 2026-05-09-resume-form-editor
     minimal_loop: false
-    notes: 支持多段 experience/education/project 增删
+    notes: SPA 内新增 view-editor，6 板块全字段编辑，数组项增删
 
   - slug: template-preview-download
     description: 模板选择、预览、PDF 下载页面

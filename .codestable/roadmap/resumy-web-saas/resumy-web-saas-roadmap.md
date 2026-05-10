@@ -269,9 +269,9 @@ Response: { resume: { id, name, data: ResumeDocument, updated_at }, warnings?: s
 5. **resume-form-editor** — 在线简历编辑表单页面
    - 所属模块：Frontend SPA
    - 依赖：[user-auth-frontend, resume-crud-api]
-   - 状态：planned
-   - 对应 feature：未启动
-   - 备注：表单字段对应 ResumeDocument 所有字段，支持多段 experience/education/project 的增删
+   - 状态：done
+   - 对应 feature：2026-05-09-resume-form-editor
+   - 备注：SPA 内新增 view-editor，6 板块全字段编辑，数组项增删
 
 6. **template-preview-download** — 模板选择、预览、PDF 下载页面
    - 所属模块：Frontend SPA
