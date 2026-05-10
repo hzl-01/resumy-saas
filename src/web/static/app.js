@@ -22,6 +22,7 @@
     $("#editor-back-btn").addEventListener("click", handleEditorBack);
     $("#editor-save-btn").addEventListener("click", handleSave);
     $("#editor-delete-btn").addEventListener("click", handleDelete);
+    $("#pdf-generate-btn").addEventListener("click", handlePdfGenerate);
 
     $("#login-password").addEventListener("keydown", function (e) { if (e.key === "Enter") handleLogin(); });
     $("#reg-password").addEventListener("keydown", function (e) { if (e.key === "Enter") handleRegister(); });
@@ -356,6 +357,79 @@
   function handleEditorBack() {
     showView("dashboard");
     loadResumeList();
+  }
+
+  // ── PDF Generation ──
+
+  async function handlePdfGenerate() {
+    hideError();
+    var btn = $("#pdf-generate-btn");
+    var statusEl = $("#pdf-status");
+    btn.disabled = true;
+    statusEl.textContent = "正在保存并生成 PDF...";
+
+    var data = collectEditorData();
+    var saveRes = await apiFetch("/api/resumes/" + currentResumeId, { data: data });
+    if (!saveRes.ok) {
+      btn.disabled = false;
+      statusEl.textContent = "";
+      showError((saveRes.data && saveRes.data.message) ? saveRes.data.message : "保存失败");
+      return;
+    }
+    resumeData = data;
+
+    var templateId = $("#pdf-template").value;
+    var pageSize = $("#pdf-pagesize").value;
+
+    var genRes = await apiFetch("/api/resumes/" + currentResumeId + "/generate", {
+      template_id: templateId,
+      page_size: pageSize,
+    });
+    if (!genRes.ok || !genRes.data || !genRes.data.job_id) {
+      btn.disabled = false;
+      statusEl.textContent = "";
+      showError((genRes.data && genRes.data.message) ? genRes.data.message : "生成失败");
+      return;
+    }
+
+    statusEl.textContent = "正在生成 PDF...";
+    pollPdfJob(genRes.data.job_id, statusEl, btn);
+  }
+
+  function pollPdfJob(jobId, statusEl, btn) {
+    var maxAttempts = 60;
+    var attempts = 0;
+    var dots = [".", "..", "..."];
+
+    var iv = setInterval(async function () {
+      attempts++;
+      var res = await apiFetch("/api/resumes/" + currentResumeId + "/generate/" + jobId + "/status");
+      if (!res.ok) {
+        clearInterval(iv);
+        btn.disabled = false;
+        statusEl.textContent = "";
+        showError("查询状态失败");
+        return;
+      }
+
+      var s = res.data.status;
+      if (s === "ready") {
+        clearInterval(iv);
+        btn.disabled = false;
+        statusEl.innerHTML = 'PDF 已生成！<a href="' + res.data.download_url + '" class="btn" style="display:inline-block;margin-left:8px;padding:6px 12px;font-size:13px;background:#4a90d9;color:#fff;text-decoration:none;border-radius:6px" download>下载 PDF</a>';
+      } else if (s === "failed") {
+        clearInterval(iv);
+        btn.disabled = false;
+        statusEl.textContent = "生成失败: " + (res.data.error || "未知错误");
+      } else {
+        statusEl.textContent = "正在生成 PDF" + dots[(attempts - 1) % 3];
+        if (attempts >= maxAttempts) {
+          clearInterval(iv);
+          btn.disabled = false;
+          statusEl.textContent = "生成超时，请重试";
+        }
+      }
+    }, 2000);
   }
 
   function showToast(msg) {

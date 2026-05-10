@@ -93,6 +93,22 @@
         <button class="btn btn-secondary add-btn" data-section="custom">+ 添加自定义板块</button>
 
         <button id="editor-delete-btn" class="btn btn-danger" style="margin-top:24px;width:auto;padding:8px 16px;font-size:13px">删除此简历</button>
+
+        <h2 class="section-title">生成 PDF</h2>
+        <div class="pdf-gen-panel">
+          <div class="form-row">
+            <div class="form-group">
+              <label>模板</label>
+              <select id="pdf-template"><option value="professional">Professional</option><option value="minimal">Minimal</option><option value="classic">Classic</option></select>
+            </div>
+            <div class="form-group">
+              <label>纸张</label>
+              <select id="pdf-pagesize"><option value="letter">Letter</option><option value="a4">A4</option></select>
+            </div>
+          </div>
+          <button id="pdf-generate-btn" class="btn btn-primary" style="width:auto;padding:8px 16px;font-size:13px;margin-top:4px">生成 PDF</button>
+          <div id="pdf-status" style="margin-top:12px;font-size:13px;color:#888"></div>
+        </div>
       </div>
     </div>
   </div>
