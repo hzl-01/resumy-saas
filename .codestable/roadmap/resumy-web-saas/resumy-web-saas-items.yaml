@@ -45,8 +45,8 @@ items:
   - slug: template-preview-download
     description: 模板选择、预览、PDF 下载页面
     depends_on: [resume-form-editor, pdf-gen-api]
-    status: planned
-    feature: null
+    status: done
+    feature: 2026-05-10-template-preview-download
     minimal_loop: true
     notes: 最小闭环的最后一步
 
