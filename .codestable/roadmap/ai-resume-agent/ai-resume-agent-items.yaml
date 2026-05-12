@@ -1,0 +1,75 @@
+roadmap: ai-resume-agent
+created: 2026-05-12
+
+items:
+  - slug: eino-service-scaffold
+    description: 新增 Go + Eino AI sidecar service，打通 Bun 到 AI service 的内部调用
+    depends_on: []
+    status: done
+    feature: 2026-05-12-eino-service-scaffold
+    minimal_loop: false
+    notes: 定义运行方式、配置、healthcheck 和 internal API 骨架
+
+  - slug: ai-job-api
+    description: 在 Bun 主服务新增 AI job API、状态机和存储表
+    depends_on: [eino-service-scaffold]
+    status: done
+    feature: 2026-05-13-ai-job-api
+    minimal_loop: false
+    notes: AI job ownership、状态持久化、权限控制
+
+  - slug: ai-document-intake
+    description: 支持 pdf、docx、text 输入并交给 AI service 做统一 intake
+    depends_on: [eino-service-scaffold, ai-job-api]
+    status: planned
+    feature: null
+    minimal_loop: false
+    notes: 替代纯启发式 import 方案
+
+  - slug: ai-resume-structuring
+    description: 实现 AI 将原始材料结构化为 ResumeDocument
+    depends_on: [ai-document-intake]
+    status: planned
+    feature: null
+    minimal_loop: false
+    notes: 核心产物是可通过 schema guard 的结构化 JSON
+
+  - slug: ai-schema-guard
+    description: 在 Bun 侧落地 AI 输出校验、warnings 与错误收口
+    depends_on: [ai-resume-structuring]
+    status: planned
+    feature: null
+    minimal_loop: false
+    notes: 必须复用 normalizeResumeDocument
+
+  - slug: ai-chat-intake-ui
+    description: 前端新增 AI 主入口页面，并隐藏或移除旧的空白新建入口
+    depends_on: [ai-job-api]
+    status: done
+    feature: 2026-05-13-ai-chat-intake-ui
+    minimal_loop: false
+    notes: 支持上传文件、贴文本、查看 job 状态；旧 editor 入口降级为 fallback
+
+  - slug: ai-clarification-loop
+    description: AI 缺信息时向用户追问，用户回答后继续生成
+    depends_on: [ai-chat-intake-ui, ai-resume-structuring]
+    status: planned
+    feature: null
+    minimal_loop: false
+    notes: 追问必须结构化，不靠自由字符串状态判断
+
+  - slug: ai-result-apply
+    description: AI 生成结果自动落成 draft resume，并跳转到现有编辑器
+    depends_on: [ai-schema-guard, ai-chat-intake-ui]
+    status: planned
+    feature: null
+    minimal_loop: true
+    notes: 保持 AI 生成、editor fallback、PDF 导出闭环
+
+  - slug: ai-jd-tailor
+    description: 输入 JD，对已有简历生成定制版 ResumeDocument
+    depends_on: [ai-schema-guard, ai-clarification-loop]
+    status: planned
+    feature: null
+    minimal_loop: false
+    notes: 以已有 resume 为基础，生成派生简历版本

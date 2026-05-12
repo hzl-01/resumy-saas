@@ -36,6 +36,8 @@
   "scripts": {
     "start": "bun run build && node dist/npm/index.js",
     "dev": "bun run --watch index.ts",
+    "ai:serve": "go run ./services/ai/cmd/server",
+    "ai:smoke": "bun run ./scripts/ai-smoke.ts",
     "build": "bun build ./index.ts --target=node --format=esm --packages=external --outfile ./dist/npm/index.js",
     "check": "tsc --noEmit",
     "test": "bun test",
@@ -46,6 +48,8 @@
     "bcryptjs": "^3.0.3",
     "cac": "^7.0.0",
     "jsonwebtoken": "^9.0.3",
+    "mammoth": "^1.12.0",
+    "pdf-parse": "^2.4.5",
     "playwright": "^1.58.2"
   },
   "devDependencies": {

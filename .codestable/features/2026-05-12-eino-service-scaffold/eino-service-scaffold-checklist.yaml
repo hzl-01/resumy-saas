@@ -1,0 +1,84 @@
+feature: 2026-05-12-eino-service-scaffold
+created: 2026-05-12
+
+steps:
+  - action: "Sidecar 骨架：建立 services/ai/ Go module、启动入口和基础配置解析"
+    exit_signal: "本地 go run 可启动 AI service，并打印监听地址"
+    status: done
+
+  - action: "编排骨架：挂上 /healthz、/internal/ai/intake、/internal/ai/continue 三个 internal route"
+    exit_signal: "healthz 返回 200，两个 internal endpoint 可访问"
+    status: done
+
+  - action: "计算节点占位：为 intake / continue 补齐最小 payload 校验和 not_implemented 结构化 stub 响应"
+    exit_signal: "合法请求返回稳定 stub envelope，非法请求返回 400 invalid_input"
+    status: done
+
+  - action: "Bun 内部接入：新增 typed internal AI client，统一 base URL、timeout、响应解析和错误映射"
+    exit_signal: "Bun 侧可调用 stub endpoint 并得到 typed result / 统一错误类型"
+    status: done
+
+  - action: "运行约定收口：补齐本地运行脚本和 smoke 验证方式，形成后续 feature 可复用的启动契约"
+    exit_signal: "实现者只看仓库内约定即可启动 sidecar 并完成一次本地 smoke"
+    status: done
+
+checks:
+  - item: "AI sidecar service 必须落在 services/ai/，而不是塞回 src/web/ 或 Bun 主进程"
+    source: 名词契约
+    status: passed
+
+  - item: "Internal AI API 只覆盖 /internal/ai/intake 与 /internal/ai/continue 两个 stub endpoint，并保持 Bun 与 AI service 的请求/响应 envelope 一致"
+    source: 名词契约
+    status: passed
+
+  - item: "运行拓扑必须是 Bun 主服务通过 typed internal client 调独立 Go sidecar，而不是直接在 Bun 进程内执行 AI workflow"
+    source: 编排骨架
+    status: passed
+
+  - item: "合法请求返回 status=failed + error.code=not_implemented，非法请求返回 400 invalid_input"
+    source: 流程级约束
+    status: passed
+
+  - item: "AI service 默认仅监听回环地址，不直接暴露为公网服务"
+    source: 流程级约束
+    status: passed
+
+  - item: "新增的根运行时目录、package.json 脚本、Bun internal AI client、internal route 表四个挂载点都已落位"
+    source: 挂载点
+    status: passed
+
+  - item: "本 feature 不实现真实模型调用、prompt 编排或 ResumeDocument 结构化生成"
+    source: 范围守护
+    status: passed
+
+  - item: "本 feature 不新增浏览器可直接访问的 /api/ai/* 对外路由"
+    source: 范围守护
+    status: passed
+
+  - item: "本 feature 不让 AI service 直接连接主数据库，也不修改现有 PDF、模板、登录、简历 CRUD 行为"
+    source: 范围守护
+    status: passed
+
+  - item: "本地执行 Go 服务启动命令后，进程成功启动并输出监听地址"
+    source: 验收场景
+    status: passed
+
+  - item: "GET /healthz 返回 200 和 { status: ok }"
+    source: 验收场景
+    status: passed
+
+  - item: "向 /internal/ai/intake 和 /internal/ai/continue 发送合法 payload 时，均返回 not_implemented 结构化结果"
+    source: 验收场景
+    status: passed
+
+  - item: "缺失 job_id 或 source 非法时，返回 400 invalid_input，且错误消息可定位字段问题"
+    source: 验收场景
+    status: passed
+
+  - item: "Bun internal client 调用 stub endpoint 时可拿到 typed result，不需要调用方手写 fetch / URL / timeout / JSON parse"
+    source: 验收场景
+    status: passed
+
+  - item: "AI service 不可达或响应异常时，Bun internal client 统一抛出归一化错误类型"
+    source: 验收场景
+    status: passed

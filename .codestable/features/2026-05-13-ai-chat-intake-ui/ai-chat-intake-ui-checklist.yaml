@@ -1,0 +1,76 @@
+feature: 2026-05-13-ai-chat-intake-ui
+created: 2026-05-13
+
+steps:
+  - action: "按第 2.5 节方案做微重构（只搬不改行为）：把 AI intake 逻辑从 app.js 拆到 ai-intake.js"
+    exit_signal: "现有登录、resume list、editor、pdf 行为无回归，页面仍能正常加载"
+    status: done
+
+  - action: "静态结构：重做 dashboard 第一屏，把 AI intake panel 提升为主入口，旧 new-resume 按钮降级为 secondary fallback"
+    exit_signal: "登录后肉眼看到 AI 主入口而不是旧新建按钮"
+    status: done
+
+  - action: "AI job 提交骨架：前端可提交背景材料和可选 JD 到 ai-job-api"
+    exit_signal: "点击开始后能创建 job，界面进入 processing / polling"
+    status: done
+
+  - action: "状态展示与 answers 提交通路：渲染 processing / needs_input / failed / ready，并支持提交 target_jd 等 answers"
+    exit_signal: "target_jd 缺失时，用户可以在 UI 内补完并继续 job"
+    status: done
+
+  - action: "fallback 收尾：保留历史 resume 列表和 secondary manual entry，不再鼓励走旧空白新建路径"
+    exit_signal: "历史 resume 仍可访问，secondary manual entry 可用，但视觉焦点已切到 AI 主入口"
+    status: done
+
+checks:
+  - item: "AI 主入口必须在 dashboard 第一屏可见，而不是继续由旧 new-resume 按钮充当首页主 CTA"
+    source: 名词契约
+    status: passed
+
+  - item: "AiIntakeDraft、JobStatusPanel、Secondary manual entry 等新名词都已在实际前端结构中落点清晰"
+    source: 名词契约
+    status: passed
+
+  - item: "登录后流程已从 CRUD-first 切到 AI-intake-first，editor 只作为 fallback"
+    source: 编排骨架
+    status: passed
+
+  - item: "job 进入 needs_input 时，前端只能渲染后端给出的 questions，不私自发明问题顺序"
+    source: 流程级约束
+    status: passed
+
+  - item: "创建 job 失败、failed 状态、answers 提交失败时，都保留用户已填写背景材料或 answers"
+    source: 流程级约束
+    status: passed
+
+  - item: "Dashboard 主 CTA、AI 视图状态、AI job API 调用点、Secondary manual entry 四个挂载点都已落位"
+    source: 挂载点
+    status: passed
+
+  - item: "本 feature 不兑现真正的文件上传解析、不自动把 ready job 跳进 editor、不继续把旧 new-resume 当首页最显眼按钮"
+    source: 范围守护
+    status: passed
+
+  - item: "登录后首页第一屏先看到 AI intake 区块，而不是旧 + 新建简历主按钮"
+    source: 验收场景
+    status: passed
+
+  - item: "提交背景材料后可以创建 AI job 并进入 processing / polling"
+    source: 验收场景
+    status: passed
+
+  - item: "后端返回 needs_input + target_jd 时，页面能展示问题表单并允许继续填写 JD"
+    source: 验收场景
+    status: passed
+
+  - item: "提交 target_jd answers 后，页面不再停留在旧问题上，而是重新进入 processing 或 failed 结果态"
+    source: 验收场景
+    status: passed
+
+  - item: "sidecar 失败时，页面展示明确错误，不清空已输入背景材料"
+    source: 验收场景
+    status: passed
+
+  - item: "历史 resume 列表仍可访问，secondary manual entry 仍能找到并进入 editor fallback"
+    source: 验收场景
+    status: passed

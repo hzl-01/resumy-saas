@@ -1,0 +1,84 @@
+feature: 2026-05-13-ai-job-api
+created: 2026-05-13
+
+steps:
+  - action: "持久化骨架：补齐 ai_jobs / ai_job_messages 表结构和基础 CRUD"
+    exit_signal: "主服务可创建并查询一条 AI job，不接 sidecar 也能持久化状态"
+    status: done
+
+  - action: "对外 API 骨架：挂上 import / compose / get / answers 四组路由和认证校验"
+    exit_signal: "鉴权、404、403、400 等基础 HTTP 语义稳定"
+    status: done
+
+  - action: "状态机编排：实现背景优先、JD 第二的 needs_input 逻辑和 target_jd 问题生成"
+    exit_signal: "仅提交背景材料时，GET job 返回 needs_input 和 target_jd 问题"
+    status: done
+
+  - action: "sidecar 集成：在 JD 已具备时调用 createAiClient() 并持久化 sidecar 结果"
+    exit_signal: "stub sidecar 返回 failed/not_implemented 时，job 查询结果也稳定反映该状态"
+    status: done
+
+  - action: "消息轨迹与测试覆盖：把 source / JD / answers / assistant questions 入库，并补齐状态机核心路径测试"
+    exit_signal: "关键场景都有自动化或可重复证据"
+    status: done
+
+checks:
+  - item: "AI job API 必须按背景优先、JD 第二的顺序建模，而不是把 JD 设为所有入口的硬前置"
+    source: 名词契约
+    status: passed
+
+  - item: "新增 AiJobRow、AiJobMessageRow、AiJobQuestion 和 AI job handlers，并在 Bun 侧落地 ai_jobs / ai_job_messages 两张表"
+    source: 名词契约
+    status: passed
+
+  - item: "Bun 必须是 AI job 状态机的唯一真相源，sidecar 只返回结构化结果，不直接持久化 job"
+    source: 编排骨架
+    status: passed
+
+  - item: "无 JD 时，job 必须进入 needs_input 并返回 target_jd 问题；已具备 JD 时才推进 sidecar 调用"
+    source: 编排骨架
+    status: passed
+
+  - item: "鉴权失败 401、非 owner 403、job 不存在 404、payload 非法 400、非法状态 409 的语义必须稳定"
+    source: 流程级约束
+    status: passed
+
+  - item: "sidecar 调用失败时，job 必须进入 failed 并持久化错误，而不是让 HTTP 请求直接把流程打崩"
+    source: 流程级约束
+    status: passed
+
+  - item: "新增的 HTTP 路由表、数据库 schema、Bun internal AI client 使用点、认证边界四个挂载点都已落位"
+    source: 挂载点
+    status: passed
+
+  - item: "本 feature 不新增浏览器 UI，不创建 draft resume，不把 /api/resumes/import 改造成 AI 主入口"
+    source: 范围守护
+    status: passed
+
+  - item: "本 feature 不实现真实简历结构化、JD match 或 prompt 编排逻辑"
+    source: 范围守护
+    status: passed
+
+  - item: "POST /api/ai/jobs/import 只提交背景材料时，后续 GET job 返回 needs_input 和 target_jd 问题"
+    source: 验收场景
+    status: passed
+
+  - item: "POST /api/ai/jobs/compose 在背景和 JD 都齐时，后续 GET job 返回 sidecar 的持久化状态（当前阶段应为 failed/not_implemented）"
+    source: 验收场景
+    status: passed
+
+  - item: "对 needs_input job 提交 target_jd answers 后，job 不再停留在旧的 JD 缺失问题上"
+    source: 验收场景
+    status: passed
+
+  - item: "对 failed 或 ready job 再提交 answers 时，返回 409 invalid_state"
+    source: 验收场景
+    status: passed
+
+  - item: "用户 A 访问用户 B 的 job 返回 403；不存在 job 返回 404"
+    source: 验收场景
+    status: passed
+
+  - item: "sidecar 不可达时，job 进入 failed，错误被持久化，创建请求不应直接把整个服务打崩"
+    source: 验收场景
+    status: passed

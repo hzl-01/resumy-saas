@@ -49,8 +49,32 @@
         <h1>你好，<span id="user-name"></span></h1>
         <button id="logout-btn" class="btn btn-danger">退出</button>
       </div>
+      <div class="ai-intake-panel">
+        <h2 class="section-title" style="margin-top:0">AI 生成简历</h2>
+        <p class="sub ai-intake-sub">先粘贴背景材料。没有 JD 也可以先开始，系统会在下一步向你追问。</p>
+        <div class="form-group">
+          <label for="ai-file">上传旧简历（可选，支持 .txt / .docx / .pdf）</label>
+          <input id="ai-file" type="file" accept=".txt,.docx,.pdf">
+        </div>
+        <div class="form-group">
+          <label for="ai-background">背景材料</label>
+          <textarea id="ai-background" rows="8" placeholder="例如：你的工作经历、项目、技术栈、教育背景、已有简历正文等"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="ai-jd">目标岗位 JD（可选）</label>
+          <textarea id="ai-jd" rows="6" placeholder="如果现在就有 JD，可以直接贴进来；没有也可以先留空"></textarea>
+        </div>
+        <div class="form-group">
+          <label for="ai-target-role">目标职位（可选）</label>
+          <input id="ai-target-role" type="text" placeholder="例如：Senior Backend Engineer">
+        </div>
+        <button id="ai-start-btn" class="btn btn-primary">开始生成</button>
+        <div id="ai-job-panel" class="ai-job-panel"></div>
+        <p class="ai-secondary-note">已有草稿仍可在下方列表继续编辑。空白新建入口不再作为主流程。</p>
+      </div>
+      <h2 class="section-title">已有简历</h2>
       <div id="resume-list"></div>
-      <button id="new-resume-btn" class="btn btn-primary" style="margin-top:16px">+ 新建简历</button>
+      <button id="new-resume-btn" class="btn btn-secondary" style="margin-top:12px">手动创建草稿（备用）</button>
     </div>
 
     <div id="view-editor" class="view card">
@@ -114,6 +138,7 @@
   </div>
 
   <script src="/static/spa-utils.js"></script>
+  <script src="/static/ai-intake.js"></script>
   <script src="/static/app.js"></script>
 </body>
 </html>

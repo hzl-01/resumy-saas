@@ -4,6 +4,9 @@
 
   function init() {
     setupNavigation();
+    if (window.aiIntake && window.aiIntake.init) {
+      window.aiIntake.init();
+    }
     var token = getToken();
     if (token) {
       verifyAndShowDashboard(token);
@@ -58,6 +61,9 @@
   }
 
   function handleLogout() {
+    if (window.aiIntake && window.aiIntake.stop) {
+      window.aiIntake.stop();
+    }
     clearToken();
     showView("login");
     $("#login-email").value = "";
@@ -79,6 +85,9 @@
   async function showDashboard(user) {
     $("#user-name").textContent = user.name || user.email;
     showView("dashboard");
+    if (window.aiIntake && window.aiIntake.onDashboardShown) {
+      window.aiIntake.onDashboardShown();
+    }
     await loadResumeList();
   }
 
@@ -89,7 +98,7 @@
     if (!res.ok) { container.innerHTML = '<p style="color:#c0392b;text-align:center">加载失败</p>'; return; }
     var list = res.data.resumes || [];
     if (list.length === 0) {
-      container.innerHTML = '<p style="color:#888;font-size:14px;text-align:center;padding:16px">还没有简历，点击下方创建</p>';
+      container.innerHTML = '<p style="color:#888;font-size:14px;text-align:center;padding:16px">还没有草稿。AI 生成完成后，结果会出现在这里。</p>';
       return;
     }
     container.innerHTML = "";
@@ -105,21 +114,25 @@
   // ── Editor ──
 
   async function handleNewResume() {
+    hideError();
     var res = await apiFetch("/api/resumes", {
-      name: "未命名简历",
+      name: "手动草稿",
       data: {
-        basics: { name: "", title: "" },
+        basics: { name: "待补充姓名", title: "待补充标题" },
         education: [], experience: [], projects: [], skills: [], customSections: []
       }
     });
     if (res.ok && res.data && res.data.resume) {
       openEditor(res.data.resume.id);
-    } else {
-      showError("创建失败");
+      return;
     }
+    showError((res.data && res.data.message) ? res.data.message : "创建草稿失败");
   }
 
   async function openEditor(id) {
+    if (window.aiIntake && window.aiIntake.stop) {
+      window.aiIntake.stop();
+    }
     currentResumeId = id;
     showView("editor");
     $("#editor-title").textContent = "编辑简历";
@@ -329,7 +342,7 @@
     var data = collectEditorData();
     var btn = $("#editor-save-btn");
     btn.disabled = true;
-    var res = await apiFetch("/api/resumes/" + currentResumeId, { data: data });
+    var res = await apiFetch("/api/resumes/" + currentResumeId, { data: data }, "PUT");
     btn.disabled = false;
     if (res.ok) {
       resumeData = data;
@@ -369,7 +382,7 @@
     statusEl.textContent = "正在保存并生成 PDF...";
 
     var data = collectEditorData();
-    var saveRes = await apiFetch("/api/resumes/" + currentResumeId, { data: data });
+    var saveRes = await apiFetch("/api/resumes/" + currentResumeId, { data: data }, "PUT");
     if (!saveRes.ok) {
       btn.disabled = false;
       statusEl.textContent = "";
@@ -445,4 +458,8 @@
   } else {
     init();
   }
+
+  window.resumyApp = {
+    openEditor: openEditor,
+  };
 })();

@@ -2,6 +2,7 @@ import { initDb, type Database } from "./db/schema.ts";
 import { registerAuthRoutes, type AuthDependencies } from "./auth/handlers.ts";
 import { resumeRoutes, type ResumeDeps } from "./resume/handlers.ts";
 import { pdfRoutes, type PdfDeps } from "./pdf/handlers.ts";
+import { aiJobRoutes, type AiJobDeps } from "./ai/handlers.ts";
 
 const STATIC_DIR = import.meta.dir ? import.meta.dir + "/static" : "./src/web/static";
 
@@ -35,6 +36,9 @@ export async function startServer(options: ServeOptions): Promise<void> {
 
       const authResult = await handleAuthRoute(method, url.pathname, request, deps);
       if (authResult) return authResult;
+
+      const aiJobResult = await handleAiJobRoute(method, url.pathname, request, deps);
+      if (aiJobResult) return aiJobResult;
 
       const pdfResult = await handlePdfRoute(method, url.pathname, request, deps);
       if (pdfResult) return pdfResult;
@@ -79,6 +83,34 @@ async function handleAuthRoute(
   return null;
 }
 
+async function handleAiJobRoute(
+  method: string,
+  pathname: string,
+  request: Request,
+  deps: AuthDependencies,
+): Promise<Response | null> {
+  const adeps: AiJobDeps = { db: deps.db, jwtSecret: deps.jwtSecret || "dev-secret" };
+
+  if (pathname === "/api/ai/jobs/import" && method === "POST") {
+    return aiJobRoutes.import(request, adeps);
+  }
+  if (pathname === "/api/ai/jobs/compose" && method === "POST") {
+    return aiJobRoutes.compose(request, adeps);
+  }
+
+  const getMatch = pathname.match(/^\/api\/ai\/jobs\/([^\/]+)$/);
+  if (getMatch && method === "GET") {
+    return aiJobRoutes.get(request, adeps, getMatch[1]!);
+  }
+
+  const answerMatch = pathname.match(/^\/api\/ai\/jobs\/([^\/]+)\/answers$/);
+  if (answerMatch && method === "POST") {
+    return aiJobRoutes.answer(request, adeps, answerMatch[1]!);
+  }
+
+  return null;
+}
+
 async function handleResumeRoute(
   method: string,
   pathname: string,
@@ -115,17 +147,17 @@ async function handlePdfRoute(
 
   const generateMatch = pathname.match(/^\/api\/resumes\/([^\/]+)\/generate$/);
   if (generateMatch && method === "POST") {
-    return pdfRoutes.generate(request, pdeps, generateMatch[1]);
+    return pdfRoutes.generate(request, pdeps, generateMatch[1]!);
   }
 
   const statusMatch = pathname.match(/^\/api\/resumes\/([^\/]+)\/generate\/([^\/]+)\/status$/);
   if (statusMatch && method === "GET") {
-    return pdfRoutes.status(request, pdeps, statusMatch[1], statusMatch[2]);
+    return pdfRoutes.status(request, pdeps, statusMatch[1]!, statusMatch[2]!);
   }
 
   const downloadMatch = pathname.match(/^\/api\/resumes\/([^\/]+)\/generate\/([^\/]+)\/download$/);
   if (downloadMatch && method === "GET") {
-    return pdfRoutes.download(request, pdeps, downloadMatch[1], downloadMatch[2]);
+    return pdfRoutes.download(request, pdeps, downloadMatch[1]!, downloadMatch[2]!);
   }
 
   return null;

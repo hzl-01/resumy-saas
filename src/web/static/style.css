@@ -216,6 +216,70 @@ body {
   color: #999;
 }
 
+.ai-intake-panel {
+  background: linear-gradient(180deg, #f8fbff 0%, #f3f7ff 100%);
+  border: 1px solid #d9e6fb;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.ai-intake-sub {
+  text-align: left !important;
+  margin-bottom: 16px !important;
+}
+
+.ai-job-panel {
+  margin-top: 16px;
+}
+
+.ai-panel-empty {
+  color: #667085;
+  font-size: 14px;
+}
+
+.ai-job-status {
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 14px;
+}
+
+.ai-job-status-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.ai-job-processing {
+  background: #eef5ff;
+  color: #24518d;
+}
+
+.ai-job-needs_input {
+  background: #fff7e8;
+  color: #8a5a12;
+}
+
+.ai-job-failed {
+  background: #fdecea;
+  color: #a3362b;
+}
+
+.ai-job-ready {
+  background: #ebf8f0;
+  color: #19663a;
+}
+
+.ai-question-list {
+  margin-top: 8px;
+}
+
+.ai-secondary-note {
+  margin-top: 12px;
+  font-size: 13px;
+  color: #667085;
+}
+
 /* Editor */
 .section-title {
   font-size: 16px;
