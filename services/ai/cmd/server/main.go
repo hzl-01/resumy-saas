@@ -17,7 +17,7 @@ func main() {
 
 	server := &http.Server{
 		Addr:    cfg.Address(),
-		Handler: httpapi.NewHandler(),
+		Handler: httpapi.NewHandler(cfg),
 	}
 
 	fmt.Printf("ai service listening on http://%s\n", cfg.Address())

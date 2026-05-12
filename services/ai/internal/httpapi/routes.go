@@ -5,12 +5,17 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+
+	"github.com/ahpxex/resume-cli/services/ai/internal/config"
+	"github.com/ahpxex/resume-cli/services/ai/internal/model"
 )
 
-func NewHandler() http.Handler {
+func NewHandler(cfg config.Config) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/healthz", handleHealthz)
-	mux.HandleFunc("/internal/ai/intake", handleIntake)
+	mux.HandleFunc("/internal/ai/intake", func(response http.ResponseWriter, request *http.Request) {
+		handleIntake(response, request, cfg)
+	})
 	mux.HandleFunc("/internal/ai/continue", handleContinue)
 	return mux
 }
@@ -24,7 +29,7 @@ func handleHealthz(response http.ResponseWriter, request *http.Request) {
 	writeJSON(response, http.StatusOK, map[string]string{"status": "ok"})
 }
 
-func handleIntake(response http.ResponseWriter, request *http.Request) {
+func handleIntake(response http.ResponseWriter, request *http.Request, cfg config.Config) {
 	if request.Method != http.MethodPost {
 		response.WriteHeader(http.StatusMethodNotAllowed)
 		return
@@ -37,6 +42,23 @@ func handleIntake(response http.ResponseWriter, request *http.Request) {
 	}
 	if err := validateIntake(payload); err != nil {
 		writeJSON(response, http.StatusBadRequest, map[string]string{"error": "invalid_input", "message": err.Error()})
+		return
+	}
+
+	if cfg.HasOpenAIProvider() {
+		document, warnings, err := model.GenerateResumeDocument(cfg, payload.Source.Text, payload.Context.TargetRole, payload.Context.JDText)
+		if err != nil {
+			writeJSON(response, http.StatusOK, ServiceResponse{
+				Status: "failed",
+				Error:  &ErrorPayload{Code: "provider_error", Message: err.Error()},
+			})
+			return
+		}
+		writeJSON(response, http.StatusOK, ServiceResponse{
+			Status:         "ready",
+			ResumeDocument: document,
+			Warnings:       warnings,
+		})
 		return
 	}
 
