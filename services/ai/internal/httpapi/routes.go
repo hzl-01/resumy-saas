@@ -45,8 +45,13 @@ func handleIntake(response http.ResponseWriter, request *http.Request, cfg confi
 		return
 	}
 
+	background := payload.Source.Text
+	if background == "" && payload.Source.ResumeDocument != nil {
+		background = model.ResumeDocumentToBackground(payload.Source.ResumeDocument)
+	}
+
 	if cfg.HasOpenAIProvider() {
-		document, warnings, err := model.GenerateResumeDocument(cfg, payload.Source.Text, payload.Context.TargetRole, payload.Context.JDText)
+		document, warnings, err := model.GenerateResumeDocument(cfg, background, payload.Context.TargetRole, payload.Context.JDText)
 		if err != nil {
 			writeJSON(response, http.StatusOK, ServiceResponse{
 				Status: "failed",
@@ -54,6 +59,20 @@ func handleIntake(response http.ResponseWriter, request *http.Request, cfg confi
 			})
 			return
 		}
+		questions := model.BuildClarificationQuestions(document, model.ExtractProfileFromText(background), model.AnalyzeJD(payload.Context.JDText))
+		if len(questions) > 0 {
+			converted := make([]Question, 0, len(questions))
+			for _, question := range questions {
+				converted = append(converted, Question{Key: question.Key, Question: question.Question, Required: question.Required})
+			}
+			writeJSON(response, http.StatusOK, ServiceResponse{
+				Status:    "needs_input",
+				Questions: converted,
+				Warnings:  append(warnings, "AI 还缺少关键事实，需要你补充后再继续生成。"),
+			})
+			return
+		}
+
 		writeJSON(response, http.StatusOK, ServiceResponse{
 			Status:         "ready",
 			ResumeDocument: document,
@@ -62,6 +81,10 @@ func handleIntake(response http.ResponseWriter, request *http.Request, cfg confi
 		return
 	}
 
+	if background == "" {
+		background = payload.Source.Text
+	}
+	payload.Source.Text = background
 	writeJSON(response, http.StatusOK, buildReadyResponse(payload))
 }
 

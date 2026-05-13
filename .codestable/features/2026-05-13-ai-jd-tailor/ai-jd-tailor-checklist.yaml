@@ -1,0 +1,27 @@
+feature: 2026-05-13-ai-jd-tailor
+created: 2026-05-13
+
+steps:
+  - action: "source resume 入口：在已有 resume 列表上暴露 AI 定制按钮"
+    exit_signal: "前端能选中一份已有 resume 进入 AI 定制模式"
+    status: done
+  - action: "compose 提交：前端提交 source_resume_id + JD"
+    exit_signal: "后端收到 compose job 并能识别 source_resume_id"
+    status: done
+  - action: "派生草稿：source resume + JD 生成新 draft 并进入 editor"
+    exit_signal: "原简历不被覆盖，生成的是新的 AI 草稿"
+    status: done
+
+checks:
+  - item: "AI 定制支持已有 resume 作为输入，而不只支持文件上传或纯文本"
+    source: 名词契约
+    status: passed
+  - item: "source_resume_id 会被 Bun 真实装载并传给 sidecar"
+    source: 编排骨架
+    status: passed
+  - item: "派生结果继续落到 resumes 表，但不覆盖 source resume"
+    source: 流程级约束
+    status: passed
+  - item: "已有 resume + 新 JD -> AI 草稿 -> editor -> PDF 这条定制链路可走通"
+    source: 验收场景
+    status: passed

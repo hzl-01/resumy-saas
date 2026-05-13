@@ -32,6 +32,7 @@ interface JobInputState {
   text?: string;
   notes?: string;
   source_resume_id?: string;
+  resume_document?: Record<string, unknown>;
   jd_text?: string;
   target_role?: string;
   extra_answers?: Record<string, string>;
@@ -216,12 +217,12 @@ async function requireOwnedJob(request: Request, deps: AiJobDeps, jobId: string)
   return { userId, job };
 }
 
-async function maybeValidateSourceResume(deps: AiJobDeps, userId: string, sourceResumeId: string | undefined): Promise<Response | null> {
+async function loadOwnedSourceResume(deps: AiJobDeps, userId: string, sourceResumeId: string | undefined): Promise<{ data: Record<string, unknown> } | Response | null> {
   if (!sourceResumeId) return null;
   const resume = getResumeById(deps.db, sourceResumeId);
   if (!resume) return json(404, { error: "not_found", message: "Source resume not found" });
   if (resume.user_id !== userId) return json(403, { error: "forbidden", message: "Access denied" });
-  return null;
+  return { data: JSON.parse(resume.data) as Record<string, unknown> };
 }
 
 async function createJob(
@@ -247,8 +248,11 @@ async function createJob(
     return json(400, { error: "invalid_input", message });
   }
 
-  const sourceResumeError = await maybeValidateSourceResume(deps, userId, input.source_resume_id);
-  if (sourceResumeError) return sourceResumeError;
+  const sourceResume = await loadOwnedSourceResume(deps, userId, input.source_resume_id);
+  if (sourceResume instanceof Response) return sourceResume;
+  if (sourceResume) {
+    input.resume_document = sourceResume.data;
+  }
 
   const id = await newId();
   const now = nowIso();
@@ -375,7 +379,7 @@ async function pushToSidecar(
       ? await client.intake({
         job_id: row.id,
         source: input.source_resume_id
-          ? { type: "resume_id", resume_document: undefined }
+          ? { type: "resume_id", resume_document: input.resume_document }
           : { type: "text", text: input.text },
         mode: row.kind as "import" | "compose" | "tailor",
         context: {
@@ -388,6 +392,16 @@ async function pushToSidecar(
 
     row.questions_json = null;
     row.updated_at = nowIso();
+
+    if (result.status === "needs_input") {
+      row.status = "needs_input";
+      row.questions_json = result.questions ? stringify(result.questions) : null;
+      row.warnings_json = result.warnings ? stringify(result.warnings) : null;
+      row.error_json = null;
+      updateAiJob(deps.db, row);
+      await persistMessage(deps.db, row.id, "assistant", { status: "needs_input", questions: result.questions || [], warnings: result.warnings || [] });
+      return;
+    }
 
     if (result.status === "ready" && result.resume_document) {
       row.status = "ready";

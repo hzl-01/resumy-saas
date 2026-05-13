@@ -21,24 +21,24 @@ items:
   - slug: ai-document-intake
     description: 支持 pdf、docx、text 输入并交给 AI service 做统一 intake
     depends_on: [eino-service-scaffold, ai-job-api]
-    status: planned
-    feature: null
+    status: done
+    feature: 2026-05-13-ai-document-intake
     minimal_loop: false
-    notes: 替代纯启发式 import 方案
+    notes: 代码路径已部分落地到 AI 主链路（真实文件上传可走通），但 feature 级 spec / acceptance 还没 backfill
 
   - slug: ai-resume-structuring
     description: 实现 AI 将原始材料结构化为 ResumeDocument
     depends_on: [ai-document-intake]
-    status: planned
-    feature: null
+    status: done
+    feature: 2026-05-13-ai-resume-structuring
     minimal_loop: false
     notes: 核心产物是可通过 schema guard 的结构化 JSON
 
   - slug: ai-schema-guard
     description: 在 Bun 侧落地 AI 输出校验、warnings 与错误收口
     depends_on: [ai-resume-structuring]
-    status: planned
-    feature: null
+    status: done
+    feature: 2026-05-13-ai-schema-guard
     minimal_loop: false
     notes: 必须复用 normalizeResumeDocument
 
@@ -53,23 +53,23 @@ items:
   - slug: ai-clarification-loop
     description: AI 缺信息时向用户追问，用户回答后继续生成
     depends_on: [ai-chat-intake-ui, ai-resume-structuring]
-    status: planned
-    feature: null
+    status: done
+    feature: 2026-05-13-ai-clarification-loop
     minimal_loop: false
-    notes: 追问必须结构化，不靠自由字符串状态判断
+    notes: 当前已有关键缺口追问雏形，剩余任务是把多轮澄清策略和提问质量完整 agent 化
 
   - slug: ai-result-apply
     description: AI 生成结果自动落成 draft resume，并跳转到现有编辑器
     depends_on: [ai-schema-guard, ai-chat-intake-ui]
-    status: planned
-    feature: null
+    status: done
+    feature: 2026-05-13-ai-result-apply
     minimal_loop: true
-    notes: 保持 AI 生成、editor fallback、PDF 导出闭环
+    notes: 代码路径已部分落地到 AI 主链路（ready 后能落草稿并进 editor，再生成 PDF），但 feature 级 spec / acceptance 还没 backfill
 
   - slug: ai-jd-tailor
     description: 输入 JD，对已有简历生成定制版 ResumeDocument
     depends_on: [ai-schema-guard, ai-clarification-loop]
-    status: planned
-    feature: null
+    status: done
+    feature: 2026-05-13-ai-jd-tailor
     minimal_loop: false
-    notes: 以已有 resume 为基础，生成派生简历版本
+    notes: 当前已接入 JD 定向改写雏形，剩余任务是把 section emphasis、bullet trimming、evidence matching 完整 agent 化

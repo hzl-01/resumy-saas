@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"sort"
 	"strings"
 	"time"
 
@@ -35,11 +36,12 @@ type openAIResponse struct {
 
 func GenerateResumeDocument(cfg config.Config, background string, targetRole string, jdText string) (map[string]any, []string, error) {
 	extracted := ExtractProfileFromText(background)
+	signals := AnalyzeJD(jdText)
 	body, err := json.Marshal(openAIRequest{
 		Model: cfg.OpenAIModel,
 		Messages: []openAIMessage{
 			{Role: "system", Content: systemPrompt()},
-			{Role: "user", Content: userPrompt(background, targetRole, jdText)},
+			{Role: "user", Content: userPrompt(background, targetRole, jdText, extracted, signals)},
 		},
 		Temperature: 0.2,
 		ResponseFormat: map[string]any{
@@ -97,11 +99,132 @@ func GenerateResumeDocument(cfg config.Config, background string, targetRole str
 }
 
 func systemPrompt() string {
-	return "You generate truthful resume drafts. Return only a JSON object matching the ResumeDocument shape with keys basics, education, experience, projects, skills, customSections. Do not use markdown fences. Do not invent facts. If a field is unknown, use explicit placeholders like 待确认姓名 or 待确认公司 only where required fields must be present. Keep output minimal but editable."
+	return strings.TrimSpace(`You are the resume-writing brain behind the resumy agent workflow.
+
+Follow these rules strictly:
+1. Candidate background comes first. The provided resume text is the primary source of truth.
+2. The target JD comes second. Tailor wording and emphasis to the JD only when the background supports it.
+3. Preserve truthfulness. Never invent employers, dates, metrics, degrees, tools, responsibilities, projects, or outcomes.
+4. Extract as many real facts as possible from the background before falling back to placeholders.
+5. Use placeholders like 待确认姓名, 待确认公司, 待确认开始时间 only when a required field is truly missing.
+6. Return only a JSON object matching this exact ResumeDocument shape:
+   - basics { name, title, email?, phone?, location?, website?, summary?, links[] }
+   - education[] { institution, degree, startDate?, endDate?, location?, highlights[] }
+   - experience[] { company, role, startDate?, endDate?, location?, summary?, highlights[], technologies[] }
+   - projects[] { name, role?, url?, summary?, highlights[], technologies[] }
+   - skills[] { name, items[] }
+   - customSections[] { title, items[] }
+7. Prefer concise, impact-oriented bullets over copying long raw paragraphs.
+8. Use JD terminology only when it matches the candidate's real background.
+9. Keep the strongest and most relevant experience and projects near the top.
+10. Group skills for scanning instead of dumping one long list.
+
+Do not wrap the JSON in markdown fences.`)
 }
 
-func userPrompt(background string, targetRole string, jdText string) string {
-	return strings.TrimSpace(fmt.Sprintf("Candidate background:\n%s\n\nTarget role hint:\n%s\n\nJD:\n%s\n\nReturn a truthful ResumeDocument JSON draft.", background, targetRole, jdText))
+func userPrompt(background string, targetRole string, jdText string, extracted ExtractedProfile, signals JDSignals) string {
+	return strings.TrimSpace(fmt.Sprintf(`Candidate background text:
+%s
+
+Target role hint:
+%s
+
+Target JD:
+%s
+
+Structured facts already extracted from the background (use these first when they are supported by the source text):
+%s
+
+JD analysis signals:
+%s
+
+Task:
+- Build a truthful ResumeDocument JSON draft.
+- Use the extracted facts whenever they are grounded in the source text.
+- Tailor summary, ordering, bullet emphasis, and skills to the JD.
+- If the JD points to backend / ecommerce / platform / payments priorities, emphasize matching real evidence from the background.
+- If some required fields are genuinely missing, use explicit placeholders only for those missing fields.
+	- Keep the output concise but ready for editing and PDF generation.`, background, emptyFallback(targetRole, "(none)"), emptyFallback(jdText, "(none)"), extractedSummary(extracted), jdSignalSummary(signals)))
+}
+
+func extractedSummary(extracted ExtractedProfile) string {
+	lines := []string{}
+	if extracted.Name != "" {
+		lines = append(lines, "- name: "+extracted.Name)
+	}
+	if extracted.Email != "" {
+		lines = append(lines, "- email: "+extracted.Email)
+	}
+	if extracted.Phone != "" {
+		lines = append(lines, "- phone: "+extracted.Phone)
+	}
+	if extracted.Location != "" {
+		lines = append(lines, "- location: "+extracted.Location)
+	}
+	if extracted.Title != "" {
+		lines = append(lines, "- current/observed title: "+extracted.Title)
+	}
+	if extracted.Summary != "" {
+		lines = append(lines, "- extracted summary: "+trimForPrompt(extracted.Summary, 240))
+	}
+	if len(extracted.Skills) > 0 {
+		skills := append([]string{}, extracted.Skills...)
+		sort.Strings(skills)
+		lines = append(lines, "- extracted skills: "+strings.Join(skills, ", "))
+	}
+	for index, exp := range extracted.Experience {
+		company := stringValue(exp["company"])
+		role := stringValue(exp["role"])
+		summary := stringValue(exp["summary"])
+		lines = append(lines, fmt.Sprintf("- experience[%d]: company=%s | role=%s | summary=%s", index, emptyFallback(company, "(missing)"), emptyFallback(role, "(missing)"), trimForPrompt(summary, 120)))
+	}
+	for index, edu := range extracted.Education {
+		institution := stringValue(edu["institution"])
+		degree := stringValue(edu["degree"])
+		lines = append(lines, fmt.Sprintf("- education[%d]: institution=%s | degree=%s", index, emptyFallback(institution, "(missing)"), emptyFallback(degree, "(missing)")))
+	}
+	if len(lines) == 0 {
+		return "- no extracted facts available"
+	}
+	return strings.Join(lines, "\n")
+}
+
+func trimForPrompt(value string, max int) string {
+	trimmed := strings.TrimSpace(value)
+	if len(trimmed) <= max {
+		return trimmed
+	}
+	return trimmed[:max] + "..."
+}
+
+func emptyFallback(value string, fallback string) string {
+	if strings.TrimSpace(value) == "" {
+		return fallback
+	}
+	return value
+}
+
+func jdSignalSummary(signals JDSignals) string {
+	lines := []string{}
+	if signals.Role != "" {
+		lines = append(lines, "- role: "+signals.Role)
+	}
+	if signals.Seniority != "" {
+		lines = append(lines, "- seniority: "+signals.Seniority)
+	}
+	if len(signals.RequiredSkills) > 0 {
+		lines = append(lines, "- required skills: "+strings.Join(signals.RequiredSkills, ", "))
+	}
+	if len(signals.DomainSignals) > 0 {
+		lines = append(lines, "- domain signals: "+strings.Join(signals.DomainSignals, ", "))
+	}
+	if len(signals.ExpectedOutcomes) > 0 {
+		lines = append(lines, "- expected outcomes: "+strings.Join(signals.ExpectedOutcomes, ", "))
+	}
+	if len(lines) == 0 {
+		return "- no JD signals extracted"
+	}
+	return strings.Join(lines, "\n")
 }
 
 func extractJSON(content string) string {

@@ -1,0 +1,30 @@
+feature: 2026-05-13-ai-resume-structuring
+created: 2026-05-13
+
+steps:
+  - action: "轻量事实抽取：从旧简历文本抽出姓名/电话/邮箱/地点/公司/职位/学校/技能"
+    exit_signal: "真实 PDF 输入时这些字段能优先出现在草稿里"
+    status: done
+  - action: "JD 分析 + Prompt 增强：把 role/seniority/skills/domain signals 注入 prompt"
+    exit_signal: "title / summary / emphasis 受 JD 影响"
+    status: done
+  - action: "模型输出归一化：字段名统一映射回 ResumeDocument"
+    exit_signal: "position/category/description 等字段被统一收口"
+    status: done
+  - action: "草稿质量验证：真实 PDF + JD 后，草稿比最初少 placeholder"
+    exit_signal: "姓名/邮箱/电话/地点/工作经历出现真实值"
+    status: done
+
+checks:
+  - item: "AI sidecar 是 structuring 主脑，轻量抽取只是辅助补强"
+    source: 名词契约
+    status: passed
+  - item: "JD 信号已进入 role/title/summary/emphasis 路径"
+    source: 编排骨架
+    status: passed
+  - item: "模型输出最终仍回到 ResumeDocument 结构"
+    source: 流程级约束
+    status: passed
+  - item: "真实 PDF 输入后，草稿关键字段明显少于早期 placeholder 版本"
+    source: 验收场景
+    status: passed

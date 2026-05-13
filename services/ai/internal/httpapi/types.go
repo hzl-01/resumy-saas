@@ -38,6 +38,13 @@ type ErrorPayload struct {
 type ServiceResponse struct {
 	Status         string         `json:"status"`
 	ResumeDocument map[string]any `json:"resume_document,omitempty"`
+	Questions      []Question     `json:"questions,omitempty"`
 	Warnings       []string       `json:"warnings,omitempty"`
 	Error          *ErrorPayload  `json:"error,omitempty"`
+}
+
+type Question struct {
+	Key      string `json:"key"`
+	Question string `json:"question"`
+	Required bool   `json:"required"`
 }

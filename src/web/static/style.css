@@ -308,6 +308,33 @@ body {
   color: #667085;
 }
 
+.ai-source-resume {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #eef5ff;
+  color: #26405f;
+  font-size: 13px;
+}
+
+.resume-item-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-inline-secondary {
+  background: #eef5ff;
+  color: #24518d;
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 999px;
+}
+
+.btn-inline-secondary:hover {
+  background: #ddeafe;
+}
+
 /* Editor */
 .section-title {
   font-size: 16px;

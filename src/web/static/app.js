@@ -105,8 +105,18 @@
     list.forEach(function (item) {
       var el = document.createElement("div");
       el.className = "resume-item";
-      el.innerHTML = '<div class="resume-item-name">' + esc(item.name) + '</div><div class="resume-item-date">' + formatDate(item.updated_at) + '</div>';
+      el.innerHTML = '<div class="resume-item-name">' + esc(item.name) + '</div><div class="resume-item-actions"><button class="btn btn-inline-secondary resume-tailor-btn">AI 定制</button><div class="resume-item-date">' + formatDate(item.updated_at) + '</div></div>';
       el.addEventListener("click", function () { openEditor(item.id); });
+      var tailorBtn = el.querySelector(".resume-tailor-btn");
+      if (tailorBtn) {
+        tailorBtn.addEventListener("click", function (event) {
+          event.stopPropagation();
+          showView("dashboard");
+          if (window.aiIntake && window.aiIntake.startFromResume) {
+            window.aiIntake.startFromResume(item.id, item.name);
+          }
+        });
+      }
       container.appendChild(el);
     });
   }

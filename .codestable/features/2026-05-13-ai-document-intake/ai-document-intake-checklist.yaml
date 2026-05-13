@@ -1,0 +1,33 @@
+feature: 2026-05-13-ai-document-intake
+created: 2026-05-13
+
+steps:
+  - action: "文本提取骨架：为 txt/docx/pdf 建立统一 UploadedIntake 返回结构"
+    exit_signal: "不同文件类型都能被转成 text + sourceType"
+    status: done
+  - action: "PDF 子进程提取：通过 Node 脚本稳定提取 PDF 文本"
+    exit_signal: "真实 PDF 文件可提取文本，不受 Bun 对 pdf-parse 的兼容性影响"
+    status: done
+  - action: "multipart import 接入：/api/ai/jobs/import 支持文件上传路径"
+    exit_signal: "上传文件 + JD 可创建 AI job 并进入后续链路"
+    status: done
+  - action: "主流程验证：真实文件上传后能进 editor 并继续生成 PDF"
+    exit_signal: "上传真实 PDF -> JD -> AI 草稿 -> editor -> PDF -> 下载"
+    status: done
+
+checks:
+  - item: "只做文本提取，不在 Bun 中做重规则解析"
+    source: 范围守护
+    status: passed
+  - item: "txt/docx/pdf 三类输入都能落成统一 UploadedIntake"
+    source: 名词契约
+    status: passed
+  - item: "PDF 提取通过 Node 子进程而不是 Bun 直吃 pdf-parse"
+    source: 编排骨架
+    status: passed
+  - item: "/api/ai/jobs/import 支持 multipart/form-data 文件上传"
+    source: 挂载点
+    status: passed
+  - item: "上传真实 PDF 后，主链路能走到 editor 和 PDF 下载"
+    source: 验收场景
+    status: passed

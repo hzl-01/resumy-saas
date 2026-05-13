@@ -1,0 +1,21 @@
+feature: 2026-05-13-ai-schema-guard
+created: 2026-05-13
+
+steps:
+  - action: "AI 输出收口：Bun 侧在 createDraftResume 里调用 normalizeResumeDocument"
+    exit_signal: "不合法 AI 输出不会直接落草稿"
+    status: done
+  - action: "ready gate：通过 schema 才返回 draft_resume_id"
+    exit_signal: "GET /api/ai/jobs/:id 里的 draft_resume_id 只出现在合法输出路径上"
+    status: done
+
+checks:
+  - item: "schema guard 保持在 Bun 侧，不下沉替代到 sidecar"
+    source: 名词契约
+    status: passed
+  - item: "normalizeResumeDocument 是 AI 输出最终收口点"
+    source: 编排骨架
+    status: passed
+  - item: "通过校验才允许 draft resume 落库"
+    source: 验收场景
+    status: passed

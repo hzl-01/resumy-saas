@@ -4,6 +4,8 @@
     pollTimer: null,
     lastJob: null,
     openedResumeId: null,
+    sourceResumeId: null,
+    sourceResumeName: null,
   };
 
   function init() {
@@ -61,8 +63,8 @@
     var file = fileInput && fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
     var btn = document.querySelector("#ai-start-btn");
 
-    if (!background && !file) {
-      showError("请先上传旧简历或粘贴背景材料");
+    if (!background && !file && !state.sourceResumeId) {
+      showError("请先上传旧简历、选择已有简历，或粘贴背景材料");
       return;
     }
 
@@ -77,6 +79,13 @@
       if (targetRole) formData.append("target_role", targetRole);
       if (background) formData.append("notes", background);
       res = await uploadAiImport(formData);
+    } else if (state.sourceResumeId) {
+      res = await apiFetch("/api/ai/jobs/compose", {
+        source_resume_id: state.sourceResumeId,
+        raw_material: background || undefined,
+        jd_text: jd || undefined,
+        target_role: targetRole || undefined,
+      });
     } else {
       var endpoint = jd ? "/api/ai/jobs/compose" : "/api/ai/jobs/import";
       var body = { text: background };
@@ -253,9 +262,35 @@
     }
   }
 
+  function setSourceResume(id, name) {
+    state.sourceResumeId = id;
+    state.sourceResumeName = name;
+    var panel = document.querySelector("#ai-source-resume");
+    if (!panel) return;
+    panel.style.display = "block";
+    panel.innerHTML = '当前将基于已有简历生成：<strong>' + esc(name) + '</strong> <button id="ai-clear-source" class="btn btn-inline-secondary" style="margin-left:8px">取消</button>';
+    var clearBtn = document.querySelector("#ai-clear-source");
+    if (clearBtn) {
+      clearBtn.onclick = function () {
+        clearSourceResume();
+      };
+    }
+  }
+
+  function clearSourceResume() {
+    state.sourceResumeId = null;
+    state.sourceResumeName = null;
+    var panel = document.querySelector("#ai-source-resume");
+    if (panel) {
+      panel.style.display = "none";
+      panel.innerHTML = "";
+    }
+  }
+
   window.aiIntake = {
     init: init,
     onDashboardShown: onDashboardShown,
     stop: stop,
+    startFromResume: setSourceResume,
   };
 })();

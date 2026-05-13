@@ -20,8 +20,9 @@ export interface ContinueRequest {
 }
 
 export interface AiServiceResponse {
-  status: "ready" | "failed";
+  status: "ready" | "needs_input" | "failed";
   resume_document?: Record<string, unknown>;
+  questions?: Array<{ key: string; question: string; required: boolean }>;
   warnings?: string[];
   error?: {
     code: string;
@@ -115,6 +116,18 @@ function parseStubResponse(data: unknown): AiServiceResponse {
       status: "ready",
       resume_document: typeof (payload as { resume_document?: unknown }).resume_document === "object"
         ? (payload as { resume_document?: Record<string, unknown> }).resume_document
+        : undefined,
+      warnings: Array.isArray((payload as { warnings?: unknown }).warnings)
+        ? (payload as { warnings?: string[] }).warnings
+        : undefined,
+    };
+  }
+
+  if (payload.status === "needs_input") {
+    return {
+      status: "needs_input",
+      questions: Array.isArray((payload as { questions?: unknown }).questions)
+        ? (payload as { questions?: Array<{ key: string; question: string; required: boolean }> }).questions
         : undefined,
       warnings: Array.isArray((payload as { warnings?: unknown }).warnings)
         ? (payload as { warnings?: string[] }).warnings

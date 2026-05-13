@@ -1,0 +1,24 @@
+feature: 2026-05-13-ai-clarification-loop
+created: 2026-05-13
+
+steps:
+  - action: "sidecar 问题生成：把关键缺失事实转成 ClarificationQuestion"
+    exit_signal: "sidecar 可返回 needs_input + questions[]"
+    status: done
+  - action: "Bun 状态机接入：持久化 needs_input 和 questions[]"
+    exit_signal: "GET job 能稳定返回 questions[]"
+    status: done
+  - action: "前端 answers 回路：提交 answers 后继续推进 job"
+    exit_signal: "用户能在 UI 内补完问题并继续生成"
+    status: done
+
+checks:
+  - item: "追问只针对关键缺失事实，不把所有 placeholder 都升级成问题"
+    source: 名词契约
+    status: passed
+  - item: "needs_input / questions[] / answers 形成闭环，而不是一次性停死"
+    source: 编排骨架
+    status: passed
+  - item: "缺 JD、缺姓名、缺核心公司/职位时可返回问题并继续推进"
+    source: 验收场景
+    status: passed

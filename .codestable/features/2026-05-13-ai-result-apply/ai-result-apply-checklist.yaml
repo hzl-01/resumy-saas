@@ -1,0 +1,30 @@
+feature: 2026-05-13-ai-result-apply
+created: 2026-05-13
+
+steps:
+  - action: "ready 结果落草稿：在 AI sidecar 返回 resume_document 时创建 draft resume"
+    exit_signal: "job 查询结果包含 draft_resume_id"
+    status: done
+  - action: "前端 editor 跳转：轮询到 ready + draft_resume_id 时自动 openEditor"
+    exit_signal: "浏览器里自动进入 editor"
+    status: done
+  - action: "链路收尾：在 editor 中继续生成 PDF 验证"
+    exit_signal: "AI 草稿 -> editor -> PDF -> 浏览器下载可走通"
+    status: done
+
+checks:
+  - item: "AI ready 结果会落到现有 resumes 表，而不是另起草稿存储"
+    source: 名词契约
+    status: passed
+  - item: "GET /api/ai/jobs/:id 返回 result.draft_resume_id"
+    source: 名词契约
+    status: passed
+  - item: "前端只在拿到新 draft_resume_id 时自动跳 editor 一次，避免循环跳转"
+    source: 编排骨架
+    status: passed
+  - item: "生成 PDF 继续复用现有 editor / pdf 内核，不另起一套导出逻辑"
+    source: 流程级约束
+    status: passed
+  - item: "上传旧简历 + JD -> draft resume -> editor -> PDF -> 下载 全链路可走通"
+    source: 验收场景
+    status: passed
