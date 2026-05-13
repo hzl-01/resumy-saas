@@ -229,6 +229,34 @@ body {
   margin-bottom: 16px !important;
 }
 
+.ai-dropzone {
+  border: 2px dashed #9bb7e8;
+  border-radius: 12px;
+  background: #f8fbff;
+  padding: 18px 16px;
+  margin-bottom: 16px;
+  text-align: center;
+  transition: border-color 0.15s, background 0.15s, transform 0.15s;
+}
+
+.ai-dropzone.is-dragover {
+  border-color: #4a90d9;
+  background: #eef5ff;
+  transform: translateY(-1px);
+}
+
+.ai-dropzone-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #26405f;
+}
+
+.ai-dropzone-sub {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #6a7d96;
+}
+
 .ai-job-panel {
   margin-top: 16px;
 }

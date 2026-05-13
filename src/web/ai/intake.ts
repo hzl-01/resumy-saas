@@ -5,13 +5,31 @@ async function parseDocx(buffer: ArrayBuffer): Promise<string> {
 }
 
 async function parsePdf(buffer: ArrayBuffer): Promise<string> {
-  const pdfModule = await import("pdf-parse") as unknown as { default?: (buffer: Buffer) => Promise<{ text: string }> };
-  const parse = pdfModule.default;
-  if (!parse) {
-    throw new Error("pdf-parse is unavailable");
+  const { tmpdir } = await import("node:os");
+  const { join } = await import("node:path");
+  const { writeFile, rm } = await import("node:fs/promises");
+  const { fileURLToPath } = await import("node:url");
+  const crypto = await import("node:crypto");
+
+  const tempPath = join(tmpdir(), `resumy-ai-pdf-${crypto.randomUUID()}.pdf`);
+  await writeFile(tempPath, Buffer.from(buffer));
+
+  try {
+    const scriptPath = fileURLToPath(new URL("./extract-pdf.mjs", import.meta.url));
+    const proc = Bun.spawn(["node", scriptPath, tempPath], {
+      env: { ...process.env },
+      stdout: "pipe",
+      stderr: "pipe",
+    });
+    const exitCode = await proc.exited;
+    if (exitCode !== 0) {
+      const stderr = await new Response(proc.stderr).text();
+      throw new Error(stderr.trim() || `pdf extraction failed (exit code ${exitCode})`);
+    }
+    return await new Response(proc.stdout).text();
+  } finally {
+    await rm(tempPath, { force: true });
   }
-  const data = await parse(Buffer.from(buffer));
-  return data.text;
 }
 
 export interface UploadedIntake {

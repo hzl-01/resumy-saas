@@ -9,9 +9,37 @@
   function init() {
     var startBtn = document.querySelector("#ai-start-btn");
     if (startBtn) startBtn.addEventListener("click", handleStart);
+
+    var dropzone = document.querySelector("#ai-dropzone");
+    var fileInput = document.querySelector("#ai-file");
+    if (dropzone && fileInput) {
+      dropzone.addEventListener("click", function () {
+        fileInput.click();
+      });
+      dropzone.addEventListener("dragover", function (event) {
+        event.preventDefault();
+        dropzone.classList.add("is-dragover");
+      });
+      dropzone.addEventListener("dragleave", function () {
+        dropzone.classList.remove("is-dragover");
+      });
+      dropzone.addEventListener("drop", function (event) {
+        event.preventDefault();
+        dropzone.classList.remove("is-dragover");
+        if (event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files.length > 0) {
+          fileInput.files = event.dataTransfer.files;
+          fileInput.dispatchEvent(new Event("change", { bubbles: true }));
+        }
+      });
+      fileInput.addEventListener("change", function () {
+        syncFileState();
+      });
+      syncFileState();
+    }
   }
 
   function onDashboardShown() {
+    syncFileState();
     renderJobPanel();
   }
 
@@ -204,6 +232,25 @@
 
     var answerBtn = document.querySelector("#ai-answer-btn");
     if (answerBtn) answerBtn.addEventListener("click", submitAnswers);
+  }
+
+  function syncFileState() {
+    var dropzone = document.querySelector("#ai-dropzone");
+    var fileInput = document.querySelector("#ai-file");
+    if (!dropzone || !fileInput) return;
+
+    var file = fileInput.files && fileInput.files[0] ? fileInput.files[0] : null;
+    var title = dropzone.querySelector(".ai-dropzone-title");
+    var sub = dropzone.querySelector(".ai-dropzone-sub");
+    if (!title || !sub) return;
+
+    if (file) {
+      title.textContent = "已选择文件：" + file.name;
+      sub.textContent = "可以直接开始生成，或重新拖入/点击更换文件";
+    } else {
+      title.textContent = "拖拽旧简历到这里";
+      sub.textContent = "支持 .txt / .docx / .pdf，也可以点击下方选择文件";
+    }
   }
 
   window.aiIntake = {
