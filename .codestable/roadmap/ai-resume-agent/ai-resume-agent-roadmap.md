@@ -15,14 +15,14 @@ related_architecture: []
 
 resumy 最初是一个 Bun + TypeScript 的 CLI 简历生成工具：用户通过结构化 flags 构造 `ResumeDocument`，选择内置模板，再生成 PDF。后续仓库新增了 Web 服务，但现有主链路仍然是“用户自己提供结构化字段，再导出 PDF”。这更像一个简历编辑器，不是 AI 驱动的简历生产工具。
 
-本 roadmap 的目标是把 resumy 升级为一个 AI 驱动的简历 agent 产品：用户上传旧简历、输入经历、提供岗位 JD 或通过多轮对话补充材料，系统用 AI 生成结构化 `ResumeDocument`，再复用现有模板与 PDF 引擎输出结果。产品主链路改成 `导入原始材料 / 粘贴信息 -> 提供 JD -> AI 生成 -> editor fallback -> PDF 导出`；现有 CLI / Web / 渲染内核继续作为底座，这份 roadmap 负责 AI 化演进。
+本 roadmap 的目标是把 resumy 升级为一个 AI 驱动的简历 agent 产品：用户上传旧简历、输入背景材料、提供岗位 JD 或通过多轮对话补充材料，系统通过 Eino / 模型驱动的 agent 直接生成结构化 `ResumeDocument` 草稿，再复用现有模板与 PDF 引擎输出结果。产品主链路改成 `上传旧简历/背景材料 -> 提供 JD -> AI 直出草稿 -> editor fallback -> PDF 导出`；现有 CLI / Web / 渲染内核继续作为底座，这份 roadmap 负责 AI 化演进。
 
 ## 2. 范围与明确不做
 
 ### 本 roadmap 覆盖
 - 原始材料输入：docx / pdf / free text / 对话补充
 - AI intake 成为 Web 产品主入口，旧的“新建空白简历再手填”入口降级为 fallback 或移除
-- AI 提取与结构化：原始材料 -> `ResumeDocument`
+- AI 直出草稿：原始材料 + JD -> `ResumeDocument`
 - AI 澄清回路：缺失信息追问、确认后继续生成
 - AI 定制化：结合 JD 生成定制版简历内容
 - Bun 主服务与 AI service 的接口契约
@@ -60,12 +60,12 @@ ai-resume-agent
 - **触碰的现有代码 / 模块**：新服务，建议放 `services/ai/`；不直接修改现有 Bun 内核
 
 ### Document Intake Layer
-- **职责**：接收 pdf/docx/raw text，抽取纯文本和基础元信息，作为 AI 结构化输入
+- **职责**：接收 pdf/docx/raw text，仅做文本提取与最小清洗，随后直接交给 AI agent
 - **承载的子 feature**：ai-document-intake
 - **触碰的现有代码 / 模块**：Bun 上传入口 + AI service intake module；替代当前纯启发式 import 方向
 
 ### Resume Structuring Pipeline
-- **职责**：把原始文本、对话材料、用户补充信息转换为 `ResumeDocument`
+- **职责**：由 Eino / 模型驱动，把原始文本、对话材料、用户补充信息直接生成 `ResumeDocument` 草稿
 - **承载的子 feature**：ai-resume-structuring, ai-schema-guard
 - **触碰的现有代码 / 模块**：复用 `ResumeDocument` 与 `normalizeResumeDocument`
 
@@ -141,7 +141,7 @@ interface ResumeDocument {
 **约束**：
 - AI service 输出必须是 JSON object，不允许直接输出 markdown 简历正文给 Bun 入库
 - Bun 侧统一调用 `normalizeResumeDocument()` 做最终收口
-- 校验失败不能直接入库，必须返回结构化错误和 warnings
+- 校验失败不能直接入库，必须返回结构化错误和 warnings；但不把重规则解析器重新塞进 Bun 主服务
 
 ### 4.2 AI Job API
 

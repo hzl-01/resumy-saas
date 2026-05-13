@@ -192,7 +192,7 @@
     if (!panel) return;
 
     if (!state.lastJob) {
-      panel.innerHTML = '<p class="ai-panel-empty">先粘贴你的背景材料。若暂时没有 JD，也可以先开始，系统会下一步问你。</p>';
+      panel.innerHTML = '<p class="ai-panel-empty">先上传旧简历并填写目标岗位 JD。只有没有文件时，再用文本框直接粘贴背景材料。</p>';
       return;
     }
 
@@ -249,7 +249,7 @@
       sub.textContent = "可以直接开始生成，或重新拖入/点击更换文件";
     } else {
       title.textContent = "拖拽旧简历到这里";
-      sub.textContent = "支持 .txt / .docx / .pdf，也可以点击下方选择文件";
+      sub.textContent = "支持 .txt / .docx / .pdf。优先上传文件，没有文件时再用文本框。";
     }
   }
 

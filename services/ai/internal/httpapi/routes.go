@@ -91,9 +91,13 @@ func handleContinue(response http.ResponseWriter, request *http.Request) {
 }
 
 func buildReadyResponse(payload IntakeRequest) ServiceResponse {
+	extracted := model.ExtractProfileFromText(payload.Source.Text)
 	title := payload.Context.TargetRole
 	if title == "" {
 		title = inferTitle(payload.Context.JDText)
+	}
+	if title == "" {
+		title = extracted.Title
 	}
 	if title == "" {
 		title = "待确认职位"
@@ -109,30 +113,39 @@ func buildReadyResponse(payload IntakeRequest) ServiceResponse {
 		highlights = []string{"根据现有背景材料生成的初稿，待用户补充与确认。"}
 	}
 
-	return ServiceResponse{
-		Status: "ready",
-		ResumeDocument: map[string]any{
-			"basics": map[string]any{
-				"name":    "待确认姓名",
-				"title":   title,
-				"summary": background,
-				"links":   []any{},
-			},
-			"education": []any{},
-			"experience": []any{
-				map[string]any{
-					"company":      "待确认公司",
-					"role":         title,
-					"summary":      background,
-					"highlights":   highlights,
-					"technologies": []any{},
-				},
-			},
-			"projects":       []any{},
-			"skills":         []any{},
-			"customSections": []any{},
+	document := map[string]any{
+		"basics": map[string]any{
+			"name":     fallbackString(extracted.Name, "待确认姓名"),
+			"title":    title,
+			"email":    optionalText(extracted.Email),
+			"phone":    optionalText(extracted.Phone),
+			"location": optionalText(extracted.Location),
+			"summary":  chooseSummary(extracted.Summary, background),
+			"links":    []any{},
 		},
-		Warnings: []string{"AI sidecar 当前返回的是最小可编辑草稿，请在 editor 中继续补全姓名、公司和细节。"},
+		"education":      mapsToAny(extracted.Education),
+		"experience":     mapsToAny(extracted.Experience),
+		"projects":       []any{},
+		"skills":         buildSkillGroups(extracted.Skills),
+		"customSections": []any{},
+	}
+
+	if len(extracted.Experience) == 0 {
+		document["experience"] = []any{
+			map[string]any{
+				"company":      "待确认公司",
+				"role":         title,
+				"summary":      background,
+				"highlights":   highlights,
+				"technologies": []any{},
+			},
+		}
+	}
+
+	return ServiceResponse{
+		Status:         "ready",
+		ResumeDocument: document,
+		Warnings:       []string{"AI sidecar 当前返回的是最小可编辑草稿，请在 editor 中继续补全姓名、公司和细节。"},
 	}
 }
 
@@ -184,6 +197,46 @@ func splitSentences(input string) []string {
 
 func trimText(input string) string {
 	return strings.Trim(input, " \n\t.;。；")
+}
+
+func fallbackString(value string, fallback string) string {
+	if value != "" {
+		return value
+	}
+	return fallback
+}
+
+func chooseSummary(extracted string, background string) string {
+	if extracted != "" {
+		return extracted
+	}
+	return background
+}
+
+func buildSkillGroups(skills []string) []any {
+	if len(skills) == 0 {
+		return []any{}
+	}
+	items := make([]any, 0, len(skills))
+	for _, skill := range skills {
+		items = append(items, skill)
+	}
+	return []any{map[string]any{"name": "技能", "items": items}}
+}
+
+func mapsToAny(items []map[string]any) []any {
+	result := make([]any, 0, len(items))
+	for _, item := range items {
+		result = append(result, item)
+	}
+	return result
+}
+
+func optionalText(value string) any {
+	if value == "" {
+		return nil
+	}
+	return value
 }
 
 func decodeJSON(request *http.Request, target any) error {

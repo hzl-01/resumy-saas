@@ -34,6 +34,7 @@ type openAIResponse struct {
 }
 
 func GenerateResumeDocument(cfg config.Config, background string, targetRole string, jdText string) (map[string]any, []string, error) {
+	extracted := ExtractProfileFromText(background)
 	body, err := json.Marshal(openAIRequest{
 		Model: cfg.OpenAIModel,
 		Messages: []openAIMessage{
@@ -90,7 +91,9 @@ func GenerateResumeDocument(cfg config.Config, background string, targetRole str
 		return nil, nil, fmt.Errorf("model did not return valid JSON: %w", err)
 	}
 
-	return NormalizeResumeDocumentMap(document), []string{"由 OpenAI-compatible provider 生成，请人工复核事实准确性。"}, nil
+	normalized := NormalizeResumeDocumentMap(document)
+	normalized = MergeExtractedProfile(normalized, extracted)
+	return normalized, []string{"由 OpenAI-compatible provider 生成，请人工复核事实准确性。"}, nil
 }
 
 func systemPrompt() string {
