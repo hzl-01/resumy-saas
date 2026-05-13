@@ -403,10 +403,8 @@ table: ai_job_messages
 
 ## 7. 观察项
 
-- 现有 requirement `web-auth` 明确写了“不支持 AI 辅助写简历内容”，如果本 roadmap 确认推进，后续应补一份新的 requirement 或更新 requirement 边界
-- 现有 `resumy-web-saas` roadmap 把 file import 定义为非 AI 解析路径；如果本 roadmap 通过，后续应把那条规划标记为被 AI 方案取代或降级为 fallback
-- 现有 architecture 文档还是骨架，AI service 落地后需要由 feature acceptance 回写现状
-- `ai-document-intake` 与 `ai-result-apply` 的代码能力已经部分落地，但 feature 级 design/checklist/acceptance 还没 backfill，当前属于“代码先行、spec 滞后”状态
+- 现有 `resumy-web-saas` roadmap 仍保留旧的非 AI Web SaaS 叙事，后续若继续维护该文档，建议明确标注它已被 `ai-resume-agent` 主路径取代或降级为历史 / fallback 方案
+- 若继续提升产品质量，下一阶段应新开 feature 或 roadmap update，聚焦草稿质量、补问体验和 JD 匹配精度，而不是继续把本 roadmap 保持在“未完成”语气
 
 ## 8. 变更日志（update 模式）
 

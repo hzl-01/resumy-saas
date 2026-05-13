@@ -24,7 +24,7 @@ items:
     status: done
     feature: 2026-05-13-ai-document-intake
     minimal_loop: false
-    notes: 代码路径已部分落地到 AI 主链路（真实文件上传可走通），但 feature 级 spec / acceptance 还没 backfill
+    notes: txt/docx/pdf 上传入口已落地，并直接进入 AI 主链路
 
   - slug: ai-resume-structuring
     description: 实现 AI 将原始材料结构化为 ResumeDocument
@@ -56,7 +56,7 @@ items:
     status: done
     feature: 2026-05-13-ai-clarification-loop
     minimal_loop: false
-    notes: 当前已有关键缺口追问雏形，剩余任务是把多轮澄清策略和提问质量完整 agent 化
+    notes: 关键缺口追问、answers 提交和继续生成回路已落地
 
   - slug: ai-result-apply
     description: AI 生成结果自动落成 draft resume，并跳转到现有编辑器
@@ -64,7 +64,7 @@ items:
     status: done
     feature: 2026-05-13-ai-result-apply
     minimal_loop: true
-    notes: 代码路径已部分落地到 AI 主链路（ready 后能落草稿并进 editor，再生成 PDF），但 feature 级 spec / acceptance 还没 backfill
+    notes: ready 后自动落草稿、进 editor，并继续生成 PDF / 下载
 
   - slug: ai-jd-tailor
     description: 输入 JD，对已有简历生成定制版 ResumeDocument
@@ -72,4 +72,4 @@ items:
     status: done
     feature: 2026-05-13-ai-jd-tailor
     minimal_loop: false
-    notes: 当前已接入 JD 定向改写雏形，剩余任务是把 section emphasis、bullet trimming、evidence matching 完整 agent 化
+    notes: 支持 source_resume_id + JD 生成派生定制版 AI 草稿
