@@ -1,4 +1,5 @@
-import { chromium } from "playwright";
+import { rm } from "node:fs/promises";
+import { fileURLToPath } from "node:url";
 import { CliError } from "../cli/errors.ts";
 import { writeUtf8File } from "../io/files.ts";
 
@@ -12,43 +13,26 @@ interface RenderPdfOptions {
 export async function renderPdf(options: RenderPdfOptions): Promise<void> {
   const { html, htmlOutput, outputPath, pageSize } = options;
 
-  if (htmlOutput) {
-    await writeUtf8File(htmlOutput, html);
+  const tempHtmlPath = htmlOutput || `${outputPath}.render.html`;
+
+  await writeUtf8File(tempHtmlPath, html);
+
+  const scriptPath = fileURLToPath(new URL("./generate-pdf.mjs", import.meta.url));
+  const proc = Bun.spawn(["node", scriptPath, tempHtmlPath, outputPath, pageSize], {
+    env: { ...process.env },
+  });
+
+  const exitCode = await proc.exited;
+  if (exitCode !== 0) {
+    const stderr = await new Response(proc.stderr).text();
+    throw new CliError(stderr.trim() || `PDF generation failed (exit code ${exitCode})`);
   }
 
-  let browser;
-
-  try {
-    browser = await chromium.launch({ headless: true });
-  } catch (bundledError) {
+  if (!htmlOutput) {
     try {
-      browser = await chromium.launch({
-        channel: "chrome",
-        headless: true,
-      });
+      await rm(tempHtmlPath, { force: true });
     } catch {
-      throw new CliError(
-        "Unable to launch Chromium for PDF export. Install the browser with `bunx playwright install chromium`, or make sure Google Chrome is available locally.",
-      );
+      /* ignore temp cleanup failures */
     }
-  }
-
-  try {
-    const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: "load" });
-    await page.emulateMedia({ media: "print" });
-    await page.pdf({
-      path: outputPath,
-      format: pageSize === "a4" ? "A4" : "Letter",
-      printBackground: true,
-      margin: {
-        top: "0.5in",
-        right: "0.5in",
-        bottom: "0.5in",
-        left: "0.5in",
-      },
-    });
-  } finally {
-    await browser.close();
   }
 }

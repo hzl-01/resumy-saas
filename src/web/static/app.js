@@ -429,7 +429,13 @@
       if (s === "ready") {
         clearInterval(iv);
         btn.disabled = false;
-        statusEl.innerHTML = 'PDF 已生成！<a href="' + res.data.download_url + '" class="btn" style="display:inline-block;margin-left:8px;padding:6px 12px;font-size:13px;background:#4a90d9;color:#fff;text-decoration:none;border-radius:6px" download>下载 PDF</a>';
+        statusEl.innerHTML = 'PDF 已生成！<button id="pdf-download-btn" class="btn" style="display:inline-block;margin-left:8px;padding:6px 12px;font-size:13px;background:#4a90d9;color:#fff;border-radius:6px">下载 PDF</button>';
+        var downloadBtn = $("#pdf-download-btn");
+        if (downloadBtn) {
+          downloadBtn.onclick = function () {
+            downloadPdfWithAuth(res.data.download_url, $("#pdf-template").value || "resume");
+          };
+        }
       } else if (s === "failed") {
         clearInterval(iv);
         btn.disabled = false;
@@ -443,6 +449,43 @@
         }
       }
     }, 2000);
+  }
+
+  async function downloadPdfWithAuth(url, templateId) {
+    hideError();
+    var token = getToken();
+    if (!token) {
+      showError("下载失败：登录已失效");
+      return;
+    }
+
+    try {
+      var response = await fetch(url, {
+        headers: { Authorization: "Bearer " + token },
+      });
+      if (!response.ok) {
+        showError("下载失败，请重试");
+        return;
+      }
+
+      var blob = await response.blob();
+      var objectUrl = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = objectUrl;
+      a.download = readFileName(response.headers.get("Content-Disposition")) || ((templateId || "resume") + "-resume.pdf");
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(objectUrl); }, 1000);
+    } catch (_) {
+      showError("下载失败，请检查网络或重新生成");
+    }
+  }
+
+  function readFileName(contentDisposition) {
+    if (!contentDisposition) return null;
+    var match = contentDisposition.match(/filename="?([^";]+)"?/i);
+    return match ? match[1] : null;
   }
 
   function showToast(msg) {
