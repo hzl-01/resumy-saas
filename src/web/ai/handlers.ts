@@ -1,6 +1,7 @@
 import type { Database, AiJobRow } from "../db/schema.ts";
 import {
   getAiJobById,
+  getAiJobMessages,
   getResumeById,
   insertResume,
   insertAiJob,
@@ -163,10 +164,17 @@ async function persistMessage(db: Database, jobId: string, role: string, payload
   });
 }
 
-function toJobResponse(row: AiJobRow): Record<string, unknown> {
+function toJobResponse(db: Database, row: AiJobRow): Record<string, unknown> {
   const questions = parseJson<AiJobQuestion[]>(row.questions_json) || undefined;
   const error = parseJson<AiJobError>(row.error_json) || undefined;
   const warnings = parseJson<string[]>(row.warnings_json) || undefined;
+  const messages = getAiJobMessages(db, row.id).map(function (message) {
+    return {
+      role: message.role,
+      payload: parseJson<Record<string, unknown>>(message.payload_json) || {},
+      created_at: message.created_at,
+    };
+  });
 
   const response: Record<string, unknown> = {
     id: row.id,
@@ -184,6 +192,10 @@ function toJobResponse(row: AiJobRow): Record<string, unknown> {
   }
   if (row.result_resume_id) {
     response.result = { ...(response.result as Record<string, unknown> | undefined), draft_resume_id: row.result_resume_id };
+  }
+
+  if (messages.length > 0) {
+    response.messages = messages;
   }
 
   return response;
@@ -432,7 +444,7 @@ async function pushToSidecar(
 async function handleGetJob(request: Request, deps: AiJobDeps, jobId: string): Promise<Response> {
   const owned = await requireOwnedJob(request, deps, jobId);
   if (owned instanceof Response) return owned;
-  return json(200, toJobResponse(owned.job));
+  return json(200, toJobResponse(deps.db, owned.job));
 }
 
 async function handleAnswerJob(request: Request, deps: AiJobDeps, jobId: string): Promise<Response> {
