@@ -461,8 +461,9 @@
     }, 2000);
   }
 
-  async function downloadPdfWithAuth(url, templateId) {
+  async function downloadPdfWithAuth(url, templateId, attempt) {
     hideError();
+    attempt = attempt || 0;
     var token = getToken();
     if (!token) {
       showError("下载失败：登录已失效");
@@ -474,7 +475,13 @@
         headers: { Authorization: "Bearer " + token },
       });
       if (!response.ok) {
-        showError("下载失败，请重试");
+        if ((response.status === 400 || response.status === 404) && attempt < 5) {
+          setTimeout(function () {
+            downloadPdfWithAuth(url, templateId, attempt + 1);
+          }, 1200);
+          return;
+        }
+        showError("下载失败（HTTP " + response.status + "）");
         return;
       }
 
@@ -486,9 +493,11 @@
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
+      showToast("已触发浏览器下载");
       setTimeout(function () { URL.revokeObjectURL(objectUrl); }, 1000);
-    } catch (_) {
-      showError("下载失败，请检查网络或重新生成");
+    } catch (error) {
+      var msg = error && error.message ? error.message : "请检查网络或重新生成";
+      showError("下载失败：" + msg);
     }
   }
 

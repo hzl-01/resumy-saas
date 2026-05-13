@@ -1,9 +1,9 @@
 ---
 doc_type: roadmap
 slug: ai-resume-agent
-status: active
+status: completed
 created: 2026-05-12
-last_reviewed: 2026-05-12
+last_reviewed: 2026-05-13
 tags: [ai, resume, agent, eino]
 related_requirements: [web-auth]
 related_architecture: []
@@ -399,6 +399,8 @@ table: ai_job_messages
 2. 把剩余 `agent-resume` 能力继续产品化：完整澄清回路、系统化 JD 分析、section emphasis、bullet trimming、证据匹配
 3. 做一次最终总验收，确认“主链路已通 + agent 逻辑已对齐 + 文档已齐”
 
+当前再更新：上面 1、2 两类工作已经落地完成，roadmap 下所有子 feature 已进入 `done`。从这一刻开始，这份 roadmap 的后续工作不再属于“把能力做出来”，而属于**质量迭代**：例如提升草稿质量、减少占位符、优化补问体验、优化 JD 匹配精度。若继续推进，应另起新的 roadmap update 或新的 feature，而不是继续把本 roadmap 留在未完成状态。
+
 ## 7. 观察项
 
 - 现有 requirement `web-auth` 明确写了“不支持 AI 辅助写简历内容”，如果本 roadmap 确认推进，后续应补一份新的 requirement 或更新 requirement 边界
@@ -410,3 +412,4 @@ table: ai_job_messages
 
 - 2026-05-12：将产品主入口明确切换为 AI intake 流程；editor 定位调整为 fallback；`ai-chat-intake-ui` 负责隐藏或移除旧的空白新建入口
 - 2026-05-13：主链路已跑通到“上传文件 -> JD -> AI 草稿 -> editor -> PDF -> 浏览器下载”；后续重点切换为 `agent-resume` 剩余脑子产品化与 feature 文档 backfill
+- 2026-05-13：`ai-document-intake`、`ai-result-apply`、`ai-resume-structuring`、`ai-schema-guard`、`ai-jd-tailor`、`ai-clarification-loop` 已补齐 code + spec + acceptance；本 roadmap 范围内的子 feature 全部完成，后续进入质量迭代期
